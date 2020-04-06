@@ -187,7 +187,7 @@ var CustomizedPopupLayer = cc.Layer.extend({
         this.lotterySelected = nodeTag
         arrMenuItem = this.menu.getChildren()
         for (var i = 0; i< arrMenuItem.length; i++) {
-            if (arrMenuItem[i].getTag() != 0) {
+            if (arrMenuItem[i].getTag() !== 0) {
                 arrMenuItem[i].setTag(nodeTag)
                 break;
             }
