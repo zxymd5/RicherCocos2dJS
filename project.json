@@ -1,0 +1,36 @@
+{
+    "project_type": "javascript",
+
+    "debugMode" : 1,
+    "showFPS" : true,
+    "frameRate" : 60,
+    "noCache" : false,
+    "id" : "gameCanvas",
+    "renderMode" : 0,
+    "engineDir":"frameworks/cocos2d-html5",
+
+    "modules" : ["cocos2d", "extensions", "external"],
+
+    "jsList" : [
+        "src/resource.js",
+        "src/config.js",
+        "src/commonUtils.js",
+        "src/splashScene.js",
+        "src/menuScene.js",
+        "src/popupLayer.js",
+        "src/toastLayer.js",
+        "src/mapChooseScene.js",
+        "src/richerPlayer.js",
+        "src/item.js",
+        "src/itemBall.js",
+        "src/itemCrab.js",
+        "src/itemStrengthUp.js",
+        "src/itemFog.js",
+        "src/itemEmergency.js",
+        "src/itemStretcher.js",
+        "src/gameBaseLayer.js",
+        "src/beachScene.js",
+        "src/routeNavigation.js",
+        "src/richerGameController.js"
+    ]
+}
