@@ -67,6 +67,10 @@ var config = {
       titleTag: 20000,
       contentTag: 20001
     },
+    moveTag: {
+        GOEND: 1,
+        MOVEPASS: 0
+    },
 
     mapCount: 3,
     PLAYER_1_NAME: "player1",

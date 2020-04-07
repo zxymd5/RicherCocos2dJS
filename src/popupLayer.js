@@ -3,6 +3,7 @@ var PopupLayer = cc.Layer.extend({
     dataTag: 0,
     callbackFunc2: null,
     cbListener: null,
+    touchListener: null,
 
     ctor: function (position, size) {
         this._super()
@@ -13,7 +14,7 @@ var PopupLayer = cc.Layer.extend({
             y: position.y
         })
 
-        var touchListener = cc.EventListener.create({
+        this.touchListener = cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
             onTouchBegan: function (touch, event) {
@@ -30,9 +31,12 @@ var PopupLayer = cc.Layer.extend({
             onTouchEnded: function (touch, event) {
                 var target = event.getCurrentTarget();
             }
-        });
-        cc.eventManager.addListener(touchListener, this);
-
+        })
+        cc.eventManager.addListener(this.touchListener, this);
+    },
+    onExit: function() {
+        this._super()
+        cc.eventManager.removeListener(this.touchListener);
     },
     addBackground: function(backgroundImg) {
         var background = new cc.Sprite(backgroundImg)

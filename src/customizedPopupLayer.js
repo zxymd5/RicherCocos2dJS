@@ -3,7 +3,6 @@ var CustomizedPopupLayer = cc.Layer.extend({
     menu: null,
     contentPadding: 0,
     contentPaddingTop: 0,
-    callbackListener: null,
     callback: null,
     background: null,
     backgroundScale9: null,
@@ -22,12 +21,15 @@ var CustomizedPopupLayer = cc.Layer.extend({
     lottNumber: 0,
     lotterySelected: 0,
     arrPlayerLottery: [],
+    touchListener: null,
 
     ctor: function () {
         this._super()
 
-        this.setContentSize(cc.size(0, 0))
-        var touchListener = cc.EventListener.create({
+        this.setContentSize(cc.SizeZero)
+        this.menu = new cc.Menu()
+        this.menu.setPosition(cc.POINT_ZERO)
+        this.touchListener = cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
             onTouchBegan: function (touch, event) {
@@ -40,8 +42,16 @@ var CustomizedPopupLayer = cc.Layer.extend({
                 var target = event.getCurrentTarget();
             }
         });
-        cc.eventManager.addListener(touchListener, this);
+        // cc.eventManager.addListener(this.touchListener, this);
 
+    },
+    setVisible: function(visible) {
+      this._super()
+      if (visible) {
+          cc.eventManager.addListener(this.touchListener, this);
+      }else {
+          cc.eventManager.removeListener(this.touchListener);
+      }
     },
     addBackground: function(backgroundImage) {
         this.background = new cc.Sprite(backgroundImage)
@@ -54,8 +64,26 @@ var CustomizedPopupLayer = cc.Layer.extend({
         // backgroundScale9.setPosition(this.width / 2, this.height / 2)
         // this.addChild(backgroundScale9)
     },
+    addButton: function(normalImg, selectedImg, title, tag) {
+        var center = cc.p(cc.winSize.width / 2, cc.winSize.height / 2)
+        var item = new cc.MenuItemImage(normalImg, selectedImg, this.buttonCallback, this)
+        item.setTag(tag)
+        item.setPosition(center)
 
+        var labelSize = item.getContentSize()
+        var label = new cc.LabelTTF(title, "", 20)
+        label.setColor(cc.color.BLACK)
+        label.setPosition(cc.p(labelSize.width / 2, labelSize.height / 2))
+        item.addChild(label)
 
+        this.menu.addChild(item)
+        this.addChild(this.menu)
+    },
+    buttonCallback: function(sender) {
+        if (this.callback) {
+            this.callback._function(sender)
+        }
+    },
     addTitle: function(title, fontSize) {
         this.lblTitle = new cc.LabelTTF(title, "", fontSize)
         this.lblTitle.setFontFillColor(cc.color.BLACK)
@@ -144,6 +172,11 @@ var CustomizedPopupLayer = cc.Layer.extend({
         event.setUserData(String(config.eventTag.MSG_DIMISS_DIALOG_PUBLISH_LOTTERY_TAG))
         cc.eventManager.dispatchEvent(event)
         this.setVisible(false)
+    },
+    setHasSelectedLotteryNumber: function(arrNum) {
+        for (var i = 0; i < arrNum.length; i++) {
+            this.arrSelectedNumber.push(arrNum[i])
+        }
     },
     addPlayersInfo: function(size) {
         var center = {
@@ -331,6 +364,7 @@ var CustomizedPopupLayer = cc.Layer.extend({
     },
     onExit: function () {
         this._super()
+        cc.eventManager.removeListener(this.touchListener);
     }
 
 })

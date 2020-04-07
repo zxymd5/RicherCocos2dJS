@@ -27,6 +27,8 @@ var GameBaseLayer = cc.Layer.extend({
     itemStretcher: null,
     itemFog: null,
 
+    moveTag: 0,
+
     player1: null,
     player2: null,
 
@@ -688,14 +690,14 @@ var GameBaseLayer = cc.Layer.extend({
                 {
                     case config.PLAYER_1_TAG:
                     {
-                        this.player1.isMyTurn = false
+                        obj.player1.isMyTurn = false
 
                         var text = getText("in_hospital_remain") + " " + this.player1.restTimes + " " + getText("rich_day")
                         var toast = new ToastLayer(text, 2.0, this.player1.getPosition(), cc.callFunc(function (target) {
                             var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
                             event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
                             cc.eventManager.dispatchEvent(event)
-                        }, this))
+                        }, obj))
                         this.addChild(toast)
 
                         break;
@@ -708,8 +710,8 @@ var GameBaseLayer = cc.Layer.extend({
                             var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
                             event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
                             cc.eventManager.dispatchEvent(event)
-                        }, this))
-                        this.addChild(toast)
+                        }, obj))
+                        obj.addChild(toast)
                         break;
                     }
                 }
@@ -720,23 +722,93 @@ var GameBaseLayer = cc.Layer.extend({
                 switch (playerTag) {
                     case config.PLAYER_1_TAG:
                     {
-                        this.doRandomAskEvent(this.player1)
-                        this.scheduleOnce(this.sendMSGDealAroundLand, 2.0)
+                        obj.doRandomAskEvent(this.player1)
+                        obj.scheduleOnce(obj.sendMSGDealAroundLand, 2.0)
                         break
                     }
                     case config.PLAYER_2_TAG:
                     {
-                        this.doRandomAskEvent(this.player2)
-                        this.scheduleOnce(this.sendMSGDealAroundLand, 2.0)
+                        obj.doRandomAskEvent(obj.player2)
+                        obj.scheduleOnce(obj.sendMSGDealAroundLand, 2.0)
+                        break
+                    }
+                }
+                break
+            }
+            case config.eventTag.MSG_STRENGTH_UP30_TAG:
+            {
+                obj.doItemStrengthUp(config.eventTag.MSG_STRENGTH_UP30_TAG, parseInt(arrMessage[3]))
+                break
+            }
+            case config.eventTag.MSG_STRENGTH_UP50_TAG:
+            {
+                obj.doItemStrengthUp(config.eventTag.MSG_STRENGTH_UP50_TAG, parseInt(arrMessage[3]))
+                break
+            }
+            case config.eventTag.MSG_STRENGTH_UP80_TAG:
+            {
+                obj.doItemStrengthUp(config.eventTag.MSG_STRENGTH_UP80_TAG, parseInt(arrMessage[3]))
+                break
+            }
+            case config.eventTag.MSG_LOTTERY_TAG:
+            {
+                var playerTag = parseInt(arrMessage[3])
+                moveTag = parseInt(arrMessage[4])
+                switch (playerTag) {
+                    case config.PLAYER_1_TAG:{
+                        playEffect(soundRes.p1_need1000_wav, false)
+                        var popDialogLottery = new CustomizedPopupLayer()
+                        popDialogLottery.addBackground(res.dialogBg_png)
+                        popDialogLottery.setContentSize(cc.size(400, 220))
+                        popDialogLottery.addTitle(getText("select_lottery_title"), 20)
+                        popDialogLottery.addContent("", 20, 60, 250)
+                        popDialogLottery.popType = config.popType.LOTTERY
+                        popDialogLottery.setHasSelectedLotteryNumber(obj.player1.arrLottery)
+                        popDialogLottery.addButton(res.popupBtnBg1_png, res.popupBtnBg3_png, getText("buy_ok"), tagRes.BtnOkTag)
+                        popDialogLottery.addButton(res.popupBtnBg2_png, res.popupBtnBg3_png, getText("cancel"), tagRes.BtnCancelTag)
+                        popDialogLottery.callback = cc.callFunc(obj.lotteryButtonCallback, obj)
+                        obj.addChild(popDialogLottery)
+                        break
+                    }
+                    case config.PLAYER_2_TAG: {
+                        var randomLotteryNumber = (Math.random() * 30 + 1) | 0
+                        while (obj.lotteryNumberInLottery(obj.player2.arrLottery, randomLotteryNumber))
+                        {
+                            randomLotteryNumber = (Math.random() * 30 + 1) | 0
+                        }
+                        obj.player2.arrLottery.push(randomLotteryNumber)
+                        obj.refreshMoneyLabel(obj.player2, -1000)
+                        if (obj.moveTag === config.moveTag.GOEND) {
+                            var msg = getText("buy_lottery") + " 10000"
+                            var toast = new ToastLayer(msg, 2.0, obj.player2.getPosition(), cc.callFunc(function (target) {
+                                var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+                                event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+                                cc.eventManager.dispatchEvent(event)
+                            }, obj))
+                            obj.addChild(toast)
+                        } else if (obj.moveTag === config.moveTag.MOVEPASS) {
+                            var msg = getText("buy_lottery") + " 10000"
+                            var toast = new ToastLayer(msg, 2.0, obj.player2.getPosition(), cc.callFunc(function (target) {
+                                var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
+                                event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
+                                cc.eventManager.dispatchEvent(event)
+                            }, obj))
+                            obj.addChild(toast)
+                        }
                         break
                     }
                 }
                 break
             }
             //todo
-            case config.eventTag.MSG_STRENGTH_UP30_TAG:
-            {
+            case config.eventTag.MSG_STOCK_TAG: {
+                var playerTag = parseInt(arrMessage[3])
+                obj.moveTag = parseInt(arrMessage[4])
+                switch (playerTag) {
+                    case config.PLAYER_1_TAG: {
 
+                    }
+                }
                 break
             }
             case config.eventTag.MSG_BLOCK_WAY_EVENT_TAG: {
@@ -757,6 +829,53 @@ var GameBaseLayer = cc.Layer.extend({
             }
         }
 
+    },
+    lotteryNumberInLottery: function(arrLottery, lotteryNumber) {
+        var result = false;
+        for (var i = 0; i < arrLottery.length; i++) {
+            if (arrLottery[i] === lotteryNumber) {
+                result = true
+                break
+            }
+        }
+        return result
+    },
+    lotteryButtonCallback: function(node) {
+        if (node.getTag() !== -1 && node.getTag() !== tagRes.BtnCancelTag) {
+            playEffect(soundRes.p1_byelottery_wav, false)
+            this.player1.arrLottery.push(node.getTag())
+            this.refreshMoneyLabel(this.player1, -1000)
+
+            if (this.moveTag === config.moveTag.GOEND) {
+                var msg = getText("buy_lottery") + " 10000"
+                var toast = new ToastLayer(msg, 2.0, this.player1.getPosition(), cc.callFunc(function (target) {
+                    var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+                    event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+                    cc.eventManager.dispatchEvent(event)
+                }, this))
+                this.addChild(toast)
+            } else if (this.moveTag === config.moveTag.MOVEPASS) {
+                var msg = getText("buy_lottery") + " 10000"
+                var toast = new ToastLayer(msg, 2.0, this.player1.getPosition(), cc.callFunc(function (target) {
+                    var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
+                    event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
+                    cc.eventManager.dispatchEvent(event)
+                }, this))
+                this.addChild(toast)
+            }
+            node.getParent().getParent().removeFromParent()
+        } else {
+            node.getParent().getParent().removeFromParent()
+            if (this.moveTag === config.moveTag.GOEND) {
+                var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+                event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+                cc.eventManager.dispatchEvent(event)
+            } else {
+                var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
+                event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
+                cc.eventManager.dispatchEvent(event)
+            }
+        }
     },
     sendMSGDealAroundLand: function(dt) {
         var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
@@ -1541,7 +1660,7 @@ var GameBaseLayer = cc.Layer.extend({
         this.popDialogLottery.addTitle(getText("publish_lottery"), 20)
         this.popDialogLottery.addContent("", 20, 60, 250)
         this.popDialogLottery.popType = config.popType.LOTTERY_PUBLISH
-        this.popDialogLottery.arrPlayers = this.arrPlayers
+        this.popDialogLottery.arrPlayers = GameBaseLayer.arrPlayers
         this.popDialogLottery.setTag(100)
         this.addChild(this.popDialogLottery)
         this.popDialogLottery.setVisible(false)
