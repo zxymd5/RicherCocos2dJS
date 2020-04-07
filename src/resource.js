@@ -118,7 +118,16 @@ var res = {
     turnBg_png: "res/LotteryTurn/turn_bg.png",
     turnArrow_png: "res/LotteryTurn/turn_arrow.png",
     lotteryP1_png: "res/LotteryTurn/lottery_p1_ha.png",
-    lotteryP2_png: "res/LotteryTurn/lottery_p1_ha.png"
+    lotteryP2_png: "res/LotteryTurn/lottery_p1_ha.png",
+    whiteBall_plist: "res/LotteryTurn/whiteBall.plist",
+    yellowBall_plist: "res/LotteryTurn/yellowBall.plist",
+    bigCircle_plist: "res/LotteryTurn/bigCircle.plist",
+    smallCircle_plist: "res/LotteryTurn/smallCircle.plist",
+    whiteBall_png: "res/LotteryTurn/whiteBall.png",
+    yellowBall_png: "res/LotteryTurn/yellowBall.png",
+    bigCircle_png: "res/LotteryTurn/bigCircle.png",
+    smallCircle_png: "res/LotteryTurn/smallCircle.png"
+
 };
 
 var soundRes = {

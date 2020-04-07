@@ -57,6 +57,12 @@ var config = {
         ITEM_EMERGENCY: 4,
         ITEM_STRETCHER: 5
     },
+    popType: {
+        NORMAL: 0,
+        LOTTERY: 1,
+        LOTTERY_PUBLISH: 2,
+        LOADGAME: 3
+    },
     popupLayer: {
       titleTag: 20000,
       contentTag: 20001

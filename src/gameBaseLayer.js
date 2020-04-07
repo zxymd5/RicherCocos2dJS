@@ -84,6 +84,8 @@ var GameBaseLayer = cc.Layer.extend({
     landFadeOut: null,
     landFadeIn: null,
     arrDisplay: [],
+    popDialogLottery: null,
+    arrRandomAskEvent: [],
 
     ctor: function () {
         this._super()
@@ -111,6 +113,13 @@ var GameBaseLayer = cc.Layer.extend({
             for (var j = 0; j < GameBaseLayer.tiledColsCount; j++) {
                 GameBaseLayer.arrCanPassGrid[i][j] = false
             }
+        }
+    },
+    initRandomAskEvent: function() {
+        var arrEvent = ["tax_rebates", "pay_taxes", "loss_strength", "physical_recovery", "investment_dividends",
+            "investment_loss", "storm_skill_up", "step_skill_up", "transfer_skill_up"]
+        for (var i = 0; i< arrEvent.length; i++) {
+            this.arrRandomAskEvent.push(getText(arrEvent[i]))
         }
     },
     addDigiteRoundSprite: function() {
@@ -628,7 +637,6 @@ var GameBaseLayer = cc.Layer.extend({
 
                 break;
             }
-            //todo
             case config.eventTag.MSG_GO_SHOW_TAG:
             {
                 if(this.gameRoundCount !== 0 && this.gameRoundCount % config.LOTTERY_ROUND_FREQUENTLY === 0)
@@ -668,8 +676,67 @@ var GameBaseLayer = cc.Layer.extend({
                 break;
             }
             case config.eventTag.MSG_ROUND_COUNT_TAG: {
-                this.gameRoundCount++
-                this.refreshRoundDisplay()
+                obj.gameRoundCount++
+                obj.refreshRoundDisplay()
+                break
+            }
+            case config.eventTag.MSG_REST_TAG: {
+                obj.buyLandX = parseFloat(arrMessage[1])
+                obj.buyLandY = parseFloat(arrMessage[2])
+                var playerTag = parseInt(arrMessage[3])
+                switch(playerTag)
+                {
+                    case config.PLAYER_1_TAG:
+                    {
+                        this.player1.isMyTurn = false
+
+                        var text = getText("in_hospital_remain") + " " + this.player1.restTimes + " " + getText("rich_day")
+                        var toast = new ToastLayer(text, 2.0, this.player1.getPosition(), cc.callFunc(function (target) {
+                            var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
+                            event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
+                            cc.eventManager.dispatchEvent(event)
+                        }, this))
+                        this.addChild(toast)
+
+                        break;
+                    }
+                    case config.PLAYER_2_TAG:
+                    {
+                        this.player2.isMyTurn = false
+                        var text = getText("in_hospital_remain") + " " + this.player2.restTimes + " " + getText("rich_day")
+                        var toast = new ToastLayer(text, 2.0, this.player2.getPosition(), cc.callFunc(function (target) {
+                            var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
+                            event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
+                            cc.eventManager.dispatchEvent(event)
+                        }, this))
+                        this.addChild(toast)
+                        break;
+                    }
+                }
+                break
+            }
+            case config.eventTag.MSG_RANDOM_ASK_EVENT_TAG:{
+                var playerTag = parseInt(arrMessage[3])
+                switch (playerTag) {
+                    case config.PLAYER_1_TAG:
+                    {
+                        this.doRandomAskEvent(this.player1)
+                        this.scheduleOnce(this.sendMSGDealAroundLand, 2.0)
+                        break
+                    }
+                    case config.PLAYER_2_TAG:
+                    {
+                        this.doRandomAskEvent(this.player2)
+                        this.scheduleOnce(this.sendMSGDealAroundLand, 2.0)
+                        break
+                    }
+                }
+                break
+            }
+            //todo
+            case config.eventTag.MSG_STRENGTH_UP30_TAG:
+            {
+
                 break
             }
             case config.eventTag.MSG_BLOCK_WAY_EVENT_TAG: {
@@ -691,12 +758,131 @@ var GameBaseLayer = cc.Layer.extend({
         }
 
     },
+    sendMSGDealAroundLand: function(dt) {
+        var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+        event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+        cc.eventManager.dispatchEvent(event)
+    },
+    doRandomAskEvent: function(player) {
+        var randomNumber = (Math.random() * (this.arrRandomAskEvent.length)) | 0
+        switch (randomNumber) {
+            case 0:
+            {
+                this.refreshMoneyLabel(player, 10000)
+                break
+            }
+            case 1:
+            {
+                if (player.getTag() === config.PLAYER_1_TAG) {
+                    playEffectRandomly(this.arrPlayer2Effect13, false)
+                } else if (player.getTag() === config.PLAYER_2_TAG) {
+                    playEffectRandomly(this.arrPlayer1Effect13, false)
+                }
+                this.refreshMoneyLabel(player, -20000)
+                break
+            }
+            case 2:
+            {
+                this.refreshStrengthLabel(player, -100)
+                break
+            }
+            case 3:
+            {
+                this.refreshStrengthLabel(player, 100)
+                break
+            }
+            case 4:
+            {
+                playEffect(soundRes.p1_speaking00181_wav, false)
+                this.refreshMoneyLabel(player, 20000)
+                break
+            }
+            case 5:
+            {
+                playEffect(soundRes.p1_speaking00182_wav, false)
+                this.refreshMoneyLabel(player, -30000)
+                break
+            }
+            case 6:
+            {
+                player.arrSkill[0]++
+                break
+            }
+            case 7:
+            {
+                player.arrSkill[1]++
+                break
+            }
+            case 8:
+            {
+                player.arrSkill[2]++
+                break
+            }
+        }
+
+        var toast = new ToastLayer(this.arrRandomAskEvent[randomNumber], 2.0, this.player1.getPosition(), null)
+        this.addChild(toast)
+    },
+    doItemStrengthUp: function(strengthUp, playerTag)
+    {
+        playEffect(soundRes.particle_mp3, false)
+        var strengthValue = 0;
+        switch(strengthUp)
+        {
+            case config.eventTag.MSG_STRENGTH_UP30_TAG:
+            {
+                strengthValue = 30;
+                break;
+            }
+
+            case config.eventTag.MSG_STRENGTH_UP50_TAG:
+            {
+                strengthValue = 50;
+                break;
+            }
+
+            case config.eventTag.MSG_STRENGTH_UP80_TAG:
+            {
+                strengthValue = 80;
+                break;
+            }
+        }
+        switch (playerTag) {
+            case config.PLAYER_1_TAG:
+            {
+                this.itemStrengthUp.setVisible(true)
+                this.itemStrengthUp.setPosition(cc.p(this.player1.x - 5, this.player1.y))
+                var action = cc.sequence(this.itemStrengthUp.normalAnim,
+                    cc.callFunc(function (target) {
+                        target.itemStrengthUp.setVisible(false)
+                    }, this))
+                this.itemStrengthUp.runAction(action)
+                var toast = new ToastLayer(getText("strength_up") + " " + strengthValue, 2.0, this.player1.getPosition(), null)
+                this.addChild(toast)
+                this.refreshStrengthLabel(this.player1, strengthValue)
+                this.scheduleOnce(this.sendMSGDealAroundLand, 3.0)
+                break
+            }
+            case config.PLAYER_2_TAG:
+            {
+                this.itemStrengthUp.setVisible(true)
+                this.itemStrengthUp.setPosition(cc.p(this.player2.x, this.player2.y))
+                var action = cc.sequence(this.itemStrengthUp.normalAnim,
+                    cc.callFunc(function (target) {
+                        target.itemStrengthUp.setVisible(false)
+                    }, this))
+                this.itemStrengthUp.runAction(action)
+                var toast = new ToastLayer(getText("strength_up") + " " + strengthValue, 2.0, this.player2.getPosition(), null)
+                this.addChild(toast)
+                this.refreshStrengthLabel(this.player2, strengthValue)
+                this.scheduleOnce(this.sendMSGDealAroundLand, 3.0)
+                break
+            }
+        }
+    },
     showGoButton: function() {
         this.btnGo.runAction(cc.moveBy(0.3, cc.p(-obj.btnGo.width * 2, 0)))
         this.btnSkill.runAction(cc.moveBy(0.3, cc.p(-obj.btnSkill.width * 2, 0)))
-    },
-    popPublishLottery: function(dt) {
-
     },
     refreshRoundDisplay: function () {
         for (var i = 0; i < this.arrRefreshRound.length; i++) {
@@ -1331,6 +1517,39 @@ var GameBaseLayer = cc.Layer.extend({
             strMoney = "$ " + money
             this.player2_money_label.setString(strMoney)
         }
+    },
+    refreshStrengthLabel: function(player, strength) {
+        var tag = player.getTag();
+        var totalStrength = player.strength + strength;
+        if(totalStrength > 100) totalStrength = 100;
+        if(totalStrength < 0) totalStrength = 0;
+        player.strength = totalStrength
+
+        if(tag === config.PLAYER_1_TAG)
+        {
+            this.player1_strength_label.setString("+ " + player.strength)
+        }
+        if(tag === config.PLAYER_2_TAG)
+        {
+            this.player2_strength_label.setString("+ " + player.strength)
+        }
+    },
+    initPopPublishLottery: function () {
+        this.popDialogLottery = new CustomizedPopupLayer()
+        this.popDialogLottery.addBackground(res.dialogBg_png)
+        this.popDialogLottery.setContentSize(cc.size(400, 400))
+        this.popDialogLottery.addTitle(getText("publish_lottery"), 20)
+        this.popDialogLottery.addContent("", 20, 60, 250)
+        this.popDialogLottery.popType = config.popType.LOTTERY_PUBLISH
+        this.popDialogLottery.arrPlayers = this.arrPlayers
+        this.popDialogLottery.setTag(100)
+        this.addChild(this.popDialogLottery)
+        this.popDialogLottery.setVisible(false)
+    },
+    popPublishLottery: function(dt) {
+        this.popDialogLottery.setVisible(true);
+        this.popDialogLottery.addPlayersLottery();
+        this.popDialogLottery.runPublishAnmi();
     }
 })
 

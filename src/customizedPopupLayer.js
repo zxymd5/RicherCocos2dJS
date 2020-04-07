@@ -21,6 +21,7 @@ var CustomizedPopupLayer = cc.Layer.extend({
     circle2: null,
     lottNumber: 0,
     lotterySelected: 0,
+    arrPlayerLottery: [],
 
     ctor: function () {
         this._super()
@@ -175,6 +176,33 @@ var CustomizedPopupLayer = cc.Layer.extend({
         }
         
     },
+    addPlayersLottery: function() {
+        for (var i = 1; i <= 30; i++) {
+            if (this.getChildByTag(1000 + i)) {
+                this.removeChildByTag(1000 + i)
+            }
+        }
+
+        var size = this.getContentSize()
+        var center = {
+            width: (cc.winSize.width - size.width) / 2,
+            height: (cc.winSize.height - size.height) / 2
+        }
+
+        for (var j = 0; j < this.arrPlayers.length; j++) {
+            var player = this.arrPlayers[i]
+            this.arrPlayerLottery = []
+            for (var i = 0; i < player.arrLottery.length; i++) {
+                var lblLotteryNumber = new cc.LabelTTF(String(player.arrLottery[i]), "", 15)
+                lblLotteryNumber.setPosition(cc.p(center.width + 20 + (i + 1) * 20, cc.winSize.height / 2 + 30 + j * 50))
+                lblLotteryNumber.setColor(cc.color(255, 100, 100))
+                lblLotteryNumber.setTag(1000 + player.arrLottery[i])
+                this.arrPlayerLottery.push(lblLotteryNumber)
+                this.addChild(lblLotteryNumber)
+            }
+        }
+
+    },
     refreshBallBackGround: function (node) {
         var nodeTag = node.getTag()
         for (var i = 0; i < this.arrLottery.length; i++) {
@@ -193,6 +221,48 @@ var CustomizedPopupLayer = cc.Layer.extend({
             }
         }
     },
+    runPublishAnmi: function() {
+        playEffect(soundRes.mashangkaijiang_wav, false)
+        this.scheduleOnce(this.realRunPublishAnmi, 3.0)
+    },
+    realRunPublishAnmi: function() {
+        var lottNumber = (Math.random() * 30 + 1) | 0
+        var angleRotate = (30 - lottNumber + 1) * 12 + 7200
+        var rotateBy = cc.rotateBy(6, angleRotate)
+        var action = rotateBy.clone().easing(cc.easeExponentialOut());
+        this.turnBg.runAction(cc.sequence(action, cc.callFunc(this.onTurnEnd, this)))
+
+        this.elliRtt1 = new cc.ParticleSystem(res.whiteBall_plist)
+        this.addChild(this.elliRtt1)
+        this.elliRtt2 = new cc.ParticleSystem(res.yellowBall_plist)
+        this.addChild(this.elliRtt2)
+
+        var config = {
+            ellipseA: 100,
+            ellipseB: 50,
+            centerPos: this.turnBg.getPosition(),
+            isAntiClockwise: true,
+            startAngle: 0,
+            selfAngle: 45
+        }
+        this.elliRtt1.runAction(new EllipseBy(2.5, config).repeatForever())
+
+        var config2 = JSON.parse(JSON.stringify(config))
+        config2.startAngle = 180
+        config2.selfAngle = -45
+        this.elliRtt2.runAction(new EllipseBy(2.5, config2).repeatForever())
+
+        this.circle1 = new cc.ParticleSystem(res.bigCircle_plist)
+        this.circle1.setPosition(this.turnBg.getPosition())
+        this.addChild(this.circle1)
+        this.circle1.runAction(cc.rotateBy(4, angleRotate))
+
+        this.circle2 = new cc.ParticleSystem(res.smallCircle_plist)
+        this.circle2.setPosition(this.turnBg.getPosition())
+        this.addChild(this.circle2)
+        this.circle2.runAction(cc.rotateBy(4, angleRotate))
+
+    },
     onEnter: function () {
         this._super()
         var center = cc.p(cc.winSize.width / 2, cc.winSize.height / 2)
@@ -202,8 +272,65 @@ var CustomizedPopupLayer = cc.Layer.extend({
             this.addChild(this.background, 0, 0)
             contentSize = this.background.getTexture().getContentSize()
         } else {
-
+            this.backgroundScale9.setContentSize(this.getContentSize())
+            this.backgroundScale9.setPosition(cc.p(cc.winSize.width / 2, cc.winSize.height / 2))
+            this.addChild(this.backgroundScale9, 0, 0)
+            contentSize = this.getContentSize()
         }
+
+        this.addChild(this.menu)
+        var btnWidth = contentSize.width / (this.menu.getChildrenCount() + 1)
+        var arrChildren = this.menu.getChildren()
+
+        for(var j = 0; j < arrChildren.length; ++j)
+        {
+            arrChildren[j].setPosition(cc.p(cc.winSize.width / 2 - contentSize.width / 2 + btnWidth * (j + 1),
+                cc.winSize.height / 2 - contentSize.height / 3))
+        }
+
+        if (this.lblTitle)
+        {
+            var pos = {
+                x: center.x,
+                y: center.y + contentSize.height / 2 - 20
+            }
+
+            this.lblTitle.setPosition(pos);
+            this.lblTitle.setColor(cc.color(0, 0, 0))
+            this.addChild(this.lblTitle);
+        }
+        
+        switch (this.popType) {
+            case config.popType.LOTTERY:
+            {
+                this.addLotteryContext(contentSize)
+                break
+            }
+            case config.popType.LOTTERY_PUBLISH:
+            {
+                this.addPublishLotteryContext(contentSize)
+                break
+            }
+            default:
+            {
+                if (this.lblContent) {
+                    this.lblContent.setPosition(cc.p(cc.winSize.width / 2, cc.winSize.height / 2));
+                    this.lblContent.setDimensions(cc.size(contentSize.width - this.contentPadding * 2,
+                        contentSize.height - this.contentPaddingTop));
+                    this.lblContent.setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT);
+                    this.lblContent.setColor(cc.color(0,0,0));
+                    this.addChild(this.lblContent)
+                }
+            }
+        }
+
+        var popAction = new cc.Sequence(cc.scaleTo(0, 0), cc.scaleTo(0.15, 1.05),
+            cc.scaleTo(0.08, 0.95), cc.scaleTo(0.08, 1.0))
+
+        this.runAction(popAction)
+    },
+    onExit: function () {
+        this._super()
     }
 
 })
