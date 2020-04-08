@@ -132,7 +132,12 @@ var res = {
     sellNormal_png: "res/images/sell_normal.png",
     sellPressed_png: "res/images/sell_pressed.png",
     arrowLeft_png: "res/images/arrow_left.png",
-    arrowRight_png: "res/images/arrow_right.png"
+    arrowRight_png: "res/images/arrow_right.png",
+    lose_png: "res/images/lose.png",
+    winParticle_plist: "res/images/win_particle.plist",
+    win_png: "res/images/win.png",
+    stars_png: "res/images/stars.png",
+    stars2_png: "res/images/stars2.png"
 };
 
 var soundRes = {

@@ -89,6 +89,9 @@ var GameBaseLayer = cc.Layer.extend({
     popDialogLottery: null,
     arrRandomAskEvent: [],
 
+    rainSprite: null,
+    transferSprite: null,
+
     ctor: function () {
         this._super()
     },
@@ -848,9 +851,84 @@ var GameBaseLayer = cc.Layer.extend({
                 }
                 break;
             }
-            //todo
             case config.eventTag.MSG_USE_SKILL_TAG:
             {
+                var playerTag = parseInt(arrMessage[3])
+                var skillIndex = parseInt(arrMessage[4])
+                var needLostStrength = parseInt(arrMessage[5])
+                var landLevel = parseInt(arrMessage[6])
+                if (playerTag === config.PLAYER_2_TAG) {
+                    obj.player2.strength -= needLostStrength
+                    obj.refreshStrengthLabel(obj.player2, 0)
+                    var pointOfGL = map2GL(cc.p(obj.player2.stop_x, obj.player2.stop_y), GameBaseLayer.map)
+                    switch (skillIndex) {
+                        case 0:
+                        {
+                            playEffect(soundRes.storm_mp3, false)
+                            playEffectRandomly(obj.arrPlayer2Effect4, false)
+                            obj.arrNextPlayerEffect = obj.arrPlayer1Effect5
+                            obj.scheduleOnce(obj.playNextEffectArr, 2)
+
+                            var rainSpriteFrames = obj.player2.rainSkill.getAnimation().getFrames()
+                            var rainSpriteFrame = rainSpriteFrames[0].getSpriteFrame()
+                            obj.rainSprite = cc.Sprite.create(rainSpriteFrame)
+                            obj.addChild(obj.rainSprite)
+                            obj.rainSprite.setAnchorPoint(cc.p(0, 0))
+                            obj.rainSprite.setPosition(cc.p(pointOfGL.x - GameBaseLayer.tiledWidth / 2, pointOfGL.y + GameBaseLayer.tiledHeight / 2))
+                            obj.rainSprite.runAction(cc.sequence(obj.player2.rainSkill,
+                                cc.callFunc(function (target) {
+                                    GameBaseLayer.landLayer.setTileGID(GameBaseLayer.blank_land_tiledID, cc.p(target.player2.stop_x, target.player2.stop_y))
+                                    target.rainSprite.removeFromParent(true)
+                                    var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
+                                    event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
+                                    cc.eventManager.dispatchEvent(event)
+                            }, obj)))
+                            break
+                        }
+                        case 2:
+                        {
+                            playEffectRandomly(obj.arrPlayer2Effect2, false)
+                            obj.arrNextPlayerEffect = obj.arrPlayer1Effect3
+                            obj.scheduleOnce(obj.playNextEffectArr, 2)
+                            var transferSpriteFrames = obj.player2.transferSkill.getAnimation().getFrames()
+                            var transferSpriteFrame = transferSpriteFrames[0].getSpriteFrame()
+                            obj.transferSprite = cc.sprite.create(transferSpriteFrame)
+                            obj.transferSprite.setAnchorPoint(cc.p(0, 0))
+                            obj.transferSprite.setPosition(pointOfGL)
+                            obj.transferSprite.runAction(cc.sequence(obj.player2.transferSkill,
+                                cc.callFunc(function (target, data) {
+                                    GameBaseLayer.landLayer.setTileGID(data[0], cc.p(target.player2.stop_x, target.player2.stop_y))
+                                    target.transferSprite.removeFromParent(true)
+                                    var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
+                                    event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
+                                    cc.eventManager.dispatchEvent(event)
+                                }, obj, [landLevel])))
+                            break
+                        }
+                    }
+                }
+                break
+            }
+            case config.eventTag.MSG_GAME_OVER_TAG:
+            {
+                var playerTag = parseInt(arrMessage[3])
+                switch (playerTag) {
+                    case config.PLAYER_1_TAG:
+                    {
+                        var gameOver = new cc.Sprite(res.lose_png)
+                        gameOver.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
+                        obj.addChild(gameOver)
+                        break
+                    }
+                    case config.PLAYER_2_TAG:
+                    {
+                        obj.playParticle(cc.p(cc.winSize.width / 2, cc.winSize.height / 2), res.winParticle_plist)
+                        var gameOver = new cc.Sprite(res.win_png)
+                        gameOver.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
+                        obj.addChild(gameOver)
+                        break
+                    }
+                }
                 break
             }
         }
