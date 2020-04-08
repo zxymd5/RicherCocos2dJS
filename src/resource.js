@@ -126,8 +126,13 @@ var res = {
     whiteBall_png: "res/LotteryTurn/whiteBall.png",
     yellowBall_png: "res/LotteryTurn/yellowBall.png",
     bigCircle_png: "res/LotteryTurn/bigCircle.png",
-    smallCircle_png: "res/LotteryTurn/smallCircle.png"
-
+    smallCircle_png: "res/LotteryTurn/smallCircle.png",
+    buyNormal_png: "res/images/buy_normal.png",
+    buyPressed_png: "res/images/buy_pressed.png",
+    sellNormal_png: "res/images/sell_normal.png",
+    sellPressed_png: "res/images/sell_pressed.png",
+    arrowLeft_png: "res/images/arrow_left.png",
+    arrowRight_png: "res/images/arrow_right.png"
 };
 
 var soundRes = {

@@ -641,13 +641,13 @@ var GameBaseLayer = cc.Layer.extend({
             }
             case config.eventTag.MSG_GO_SHOW_TAG:
             {
-                if(this.gameRoundCount !== 0 && this.gameRoundCount % config.LOTTERY_ROUND_FREQUENTLY === 0)
+                if(obj.gameRoundCount !== 0 && this.gameRoundCount % config.LOTTERY_ROUND_FREQUENTLY === 0)
                 {
-                    this.scheduleOnce(this.popPublishLottery,2.0);
+                    obj.scheduleOnce(obj.popPublishLottery,2.0);
 
                 }else
                 {
-                    this.showGoButton();
+                    obj.showGoButton();
                 }
                 break;
             }
@@ -704,9 +704,9 @@ var GameBaseLayer = cc.Layer.extend({
                     }
                     case config.PLAYER_2_TAG:
                     {
-                        this.player2.isMyTurn = false
+                        obj.player2.isMyTurn = false
                         var text = getText("in_hospital_remain") + " " + this.player2.restTimes + " " + getText("rich_day")
-                        var toast = new ToastLayer(text, 2.0, this.player2.getPosition(), cc.callFunc(function (target) {
+                        var toast = new ToastLayer(text, 2.0, obj.player2.getPosition(), cc.callFunc(function (target) {
                             var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
                             event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
                             cc.eventManager.dispatchEvent(event)
@@ -722,7 +722,7 @@ var GameBaseLayer = cc.Layer.extend({
                 switch (playerTag) {
                     case config.PLAYER_1_TAG:
                     {
-                        obj.doRandomAskEvent(this.player1)
+                        obj.doRandomAskEvent(obj.player1)
                         obj.scheduleOnce(obj.sendMSGDealAroundLand, 2.0)
                         break
                     }
@@ -800,14 +800,35 @@ var GameBaseLayer = cc.Layer.extend({
                 }
                 break
             }
-            //todo
             case config.eventTag.MSG_STOCK_TAG: {
                 var playerTag = parseInt(arrMessage[3])
                 obj.moveTag = parseInt(arrMessage[4])
                 switch (playerTag) {
                     case config.PLAYER_1_TAG: {
-
+                        var lineView = new LineChart(obj.player1, obj.arrStockPoint1, obj.arrStockPoint2,
+                                    obj.arrStockPoint3, obj.arrStockPoint4, obj.arrStockPoint5)
+                        lineView.setPosition(cc.p(0, 0))
+                        lineView.moveTag = obj.moveTag
+                        obj.addChild(lineView)
+                        break
                     }
+                    case config.PLAYER_2_TAG: {
+                        obj.doStockDeal(obj.player2, obj.moveTag)
+                        break
+                    }
+                }
+                break
+            }
+            case config.eventTag.MSG_DIMISS_DIALOG_PUBLISH_LOTTERY_TAG: {
+                for (var i = 0; i < obj.arrPlayers.length; i++) {
+                    obj.refreshMoneyLabel(obj.arrPlayers[i], 0)
+                }
+                obj.showGoButton()
+                break
+            }
+            case config.eventTag.MSG_STOCK_LAYER_DISMISS_TAG: {
+                for (var i = 0; i < obj.arrPlayers.length; i++) {
+                    obj.refreshMoneyLabel(obj.arrPlayers[i], 0)
                 }
                 break
             }
@@ -827,6 +848,11 @@ var GameBaseLayer = cc.Layer.extend({
                 }
                 break;
             }
+            //todo
+            case config.eventTag.MSG_USE_SKILL_TAG:
+            {
+                break
+            }
         }
 
     },
@@ -839,6 +865,164 @@ var GameBaseLayer = cc.Layer.extend({
             }
         }
         return result
+    },
+    doStockDeal: function(player, moveTag)
+    {
+        this.initStockVector(player)
+        var selectedTag = (Math.random() * 5) | 0
+        var buyOrSellTag = (Math.random() * 2) | 0
+
+        if (buyOrSellTag === 1) {
+            var diffMoney = player.money - this.arrStock[selectedTag].nowPrice * 100;
+            if(diffMoney >= 0)
+            {
+                var s = player.stockMap[selectedTag];
+                var storeNumber = s.storeNumber + 100;
+                var dealPrice = (s.makedealprice * s.storeNumber + this.arrStock[selectedTag].nowPrice * 100) / (100 + s.storeNumber);
+                s.storeNumber += 100
+                s.makedealprice = dealPrice
+                this.arrStock[selectedTag].storeNumber = storeNumber
+                player.money = diffMoney
+
+                if(moveTag === config.moveTag.GOEND)
+                {
+                    var msg = getText("buy") + " " + s.stockName + " 100 " + getText("shares")
+                    var toast = new ToastLayer(msg, 2.0, this.player2.getPosition(), cc.callFunc(function (target) {
+                        var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+                        event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+                        cc.eventManager.dispatchEvent(event)
+                    }, this))
+                    this.addChild(toast)
+                }else if(moveTag ===  config.moveTag.MOVEPASS)
+                {
+                    var msg = getText("buy") + " " + s.stockName + " 100 " + getText("shares")
+                    var toast = new ToastLayer(msg, 2.0, this.player2.getPosition(), cc.callFunc(function (target) {
+                        var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
+                        event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
+                        cc.eventManager.dispatchEvent(event)
+                    }, this))
+                    this.addChild(toast)
+                }
+
+            } else {
+                if(moveTag === config.moveTag.GOEND)
+                {
+                    var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+                    event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+                    cc.eventManager.dispatchEvent(event)
+                }else if(moveTag ===  config.moveTag.MOVEPASS)
+                {
+                    var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
+                    event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
+                    cc.eventManager.dispatchEvent(event)
+                }
+            }
+        } else if (buyOrSellTag == 0) {
+            var s = player.stockMap[selectedTag];
+            var storeNumber = s.storeNumber;
+            if(storeNumber > 0)
+            {
+                player.money += storeNumber * this.arrStock[selectedTag].nowPrice
+                s.makedealprice = 0
+                s.storeNumber = 0
+                if(moveTag === config.moveTag.GOEND)
+                {
+                    var msg = getText("sell") + " " + s.stockName + " " + storeNumber + " " + getText("shares")
+                    var toast = new ToastLayer(msg, 2.0, this.player2.getPosition(), cc.callFunc(function (target) {
+                        var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+                        event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+                        cc.eventManager.dispatchEvent(event)
+                    }, this))
+                    this.addChild(toast)
+
+                }else if(moveTag ===  config.moveTag.MOVEPASS)
+                {
+                    var msg = getText("sell") + " " + s.stockName + " " + storeNumber + " " + getText("shares")
+                    var toast = new ToastLayer(msg, 2.0, this.player2.getPosition(), cc.callFunc(function (target) {
+                        var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
+                        event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
+                        cc.eventManager.dispatchEvent(event)
+                    }, this))
+                    this.addChild(toast)
+                }
+            }else
+            {
+                if(moveTag === config.moveTag.GOEND)
+                {
+                    var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
+                    event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
+                    cc.eventManager.dispatchEvent(event)
+                }else if(moveTag ===  config.moveTag.MOVEPASS)
+                {
+                    var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
+                    event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
+                    cc.eventManager.dispatchEvent(event)
+                }
+            }
+        }
+
+        this.refreshMoneyLabel(player, 0)
+    },
+    initStockVector: function(player)
+    {
+        this.arrStock = []
+
+        var percent = 0
+        var size = this.arrStockPoint1.length
+        if (size > 1) {
+            percent = (this.arrStockPoint1[size - 1] - this.arrStockPoint1[size - 2]) / this.arrStockPoint1[size - 2] * 100
+        }
+        var stock = this.getStockFromMap(0, player.stockMap)
+        this.arrStock.push(new Stock(800100, getText("rich_technology"), this.arrStockPoint1[size - 1],
+            stock.makedealprice, percent, stock.storeNumber))
+
+        percent = 0
+        size = this.arrStockPoint2.length
+        if (size > 1) {
+            percent = (this.arrStockPoint2[size - 1] - this.arrStockPoint2[size - 2]) / this.arrStockPoint2[size - 2] * 100
+        }
+        stock = this.getStockFromMap(1, player.stockMap)
+        this.arrStock.push(new Stock(800200, getText("rich_oil"), this.arrStockPoint2[size - 1],
+            stock.makedealprice, percent, stock.storeNumber))
+
+        percent = 0
+        size = this.arrStockPoint3.length
+        if (size > 1) {
+            percent = (this.arrStockPoint3[size - 1] - this.arrStockPoint3[size - 2]) / this.arrStockPoint3[size - 2] * 100
+        }
+        stock = this.getStockFromMap(2, player.stockMap)
+        this.arrStock.push(new Stock(800300, getText("icbc"), this.arrStockPoint3[size - 1],
+            stock.makedealprice, percent, stock.storeNumber))
+
+        percent = 0
+        size = this.arrStockPoint4.length
+        if (size > 1) {
+            percent = (this.arrStockPoint4[size - 1] - this.arrStockPoint4[size - 2]) / this.arrStockPoint4[size - 2] * 100
+        }
+        stock = this.getStockFromMap(3, player.stockMap)
+        this.arrStock.push(new Stock(800400, getText("huatuo_medicine"), this.arrStockPoint4[size - 1],
+            stock.makedealprice, percent, stock.storeNumber))
+
+        percent = 0
+        size = this.arrStockPoint5.length
+        if (size > 1) {
+            percent = (this.arrStockPoint5[size - 1] - this.arrStockPoint5[size - 2]) / this.arrStockPoint5[size - 2] * 100
+        }
+        stock = this.getStockFromMap(4, player.stockMap)
+        this.arrStock.push(new Stock(800500, getText("demolition_construction"), this.arrStockPoint5[size - 1],
+            stock.makedealprice, percent, stock.storeNumber))
+
+    },
+    getStockFromMap: function(key, stockMap) {
+        var stock = null
+        for (var i = 0; i < stockMap.length; i++)
+        {
+            if (stockMap[i].key === key) {
+                stock = stockMap[i].stock
+                break
+            }
+        }
+        return stock
     },
     lotteryButtonCallback: function(node) {
         if (node.getTag() !== -1 && node.getTag() !== tagRes.BtnCancelTag) {

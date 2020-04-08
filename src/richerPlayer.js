@@ -23,13 +23,13 @@ var RicherPlayer = cc.Sprite.extend({
     transferSkill: null,
     arrSkill: [],
     arrLottery: [],
+    stockMap: [],
 
     ctor: function(name, tag, enemy, money, strength)
     {
         this._super()
         this.init(name, tag, enemy, money, strength)
     },
-    // todo
     init: function(name, tag, enemy, money, strength)
     {
         this.setTag(tag)
@@ -56,6 +56,27 @@ var RicherPlayer = cc.Sprite.extend({
         this.strength = strength
         this.isMyTurn = true
         this.restTimes = 0
+
+        this.stockMap.push({
+            key: 0,
+            stock: new Stock(800100, getText("rich_technology"), 0, 10, 0, 100)
+        })
+        this.stockMap.push({
+            key: 1,
+            stock: new Stock(800200, getText("rich_technology"), 0, 20, 0, 200)
+        })
+        this.stockMap.push({
+            key: 2,
+            stock: new Stock(800300, getText("rich_technology"), 0, 70, 0, 800)
+        })
+        this.stockMap.push({
+            key: 3,
+            stock: new Stock(800400, getText("rich_technology"), 0, 10, 0, 400)
+        })
+        this.stockMap.push({
+            key: 4,
+            stock: new Stock(800500, getText("rich_technology"), 0, 0, 0, 0)
+        })
 
         this.arrSkill.push([1, 1, 1])
         this.addSkillAnimation()

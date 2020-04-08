@@ -20,6 +20,8 @@
         "src/popupLayer.js",
         "src/toastLayer.js",
         "src/mapChooseScene.js",
+        "src/stock.js",
+        "src/lineChart.js",
         "src/richerPlayer.js",
         "src/item.js",
         "src/itemBall.js",
