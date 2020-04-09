@@ -91,6 +91,18 @@ var GameBaseLayer = cc.Layer.extend({
 
     rainSprite: null,
     transferSprite: null,
+    skillStorm: null,
+    skillStep: null,
+    skillTransfer: null,
+    isSkillLayerShow: false,
+    isStepLayerShow: false,
+
+    btnStep1: null,
+    btnStep2: null,
+    btnStep3: null,
+    btnStep4: null,
+    btnStep5: null,
+    btnStep6: null,
 
     ctor: function () {
         this._super()
@@ -307,6 +319,7 @@ var GameBaseLayer = cc.Layer.extend({
         btnStep1.setVisible(false)
         btnStep1.setTag(GameBaseLayer.step1_tag)
         menu.addChild(btnStep1)
+        this.btnStep1 = btnStep1
 
         var btnStep2 = new cc.MenuItemImage(res.step2Normal_png, res.step2Pressed_png, this.goButtonCallback, this)
         btnStep2.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
@@ -314,6 +327,7 @@ var GameBaseLayer = cc.Layer.extend({
         btnStep2.setVisible(false)
         btnStep2.setTag(GameBaseLayer.step2_tag)
         menu.addChild(btnStep2)
+        this.btnStep2 = btnStep2
 
         var btnStep3 = new cc.MenuItemImage(res.step3Normal_png, res.step3Pressed_png, this.goButtonCallback, this)
         btnStep3.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
@@ -321,6 +335,7 @@ var GameBaseLayer = cc.Layer.extend({
         btnStep3.setVisible(false)
         btnStep3.setTag(GameBaseLayer.step3_tag)
         menu.addChild(btnStep3)
+        this.btnStep3 = btnStep3
 
         var btnStep4 = new cc.MenuItemImage(res.step4Normal_png, res.step4Pressed_png, this.goButtonCallback, this)
         btnStep4.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
@@ -328,6 +343,7 @@ var GameBaseLayer = cc.Layer.extend({
         btnStep4.setVisible(false)
         btnStep4.setTag(GameBaseLayer.step4_tag)
         menu.addChild(btnStep4)
+        this.btnStep4 = btnStep4
 
         var btnStep5 = new cc.MenuItemImage(res.step5Normal_png, res.step5Pressed_png, this.goButtonCallback, this)
         btnStep5.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
@@ -335,6 +351,7 @@ var GameBaseLayer = cc.Layer.extend({
         btnStep5.setVisible(false)
         btnStep5.setTag(GameBaseLayer.step5_tag)
         menu.addChild(btnStep5)
+        this.btnStep5 = btnStep5
 
         var btnStep6 = new cc.MenuItemImage(res.step6Normal_png, res.step6Pressed_png, this.goButtonCallback, this)
         btnStep6.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
@@ -342,25 +359,211 @@ var GameBaseLayer = cc.Layer.extend({
         btnStep6.setVisible(false)
         btnStep6.setTag(GameBaseLayer.step6_tag)
         menu.addChild(btnStep6)
+        this.btnStep6 = btnStep6
+
+        this.skillStorm = new SkillCard(getText("rain"), getText("grade"), getText("lost_strength"),
+            getText("down_grade"), GameBaseLayer.skillSpriteCardWidth,
+            GameBaseLayer.skillSpriteCardHeight, 100, -130, GameBaseLayer.skillStormTag,
+            res.thunderstorm_png)
+        this.addChild(this.skillStorm, 50)
+
+        this.skillStep = new SkillCard(getText("goby_heart"), getText("grade"), getText("lost_strength"),
+            getText("goby_heart_info"), GameBaseLayer.skillSpriteCardWidth,
+            GameBaseLayer.skillSpriteCardHeight, 280, -130, GameBaseLayer.skillStepTag,
+            res.skillStep_png)
+        this.addChild(this.skillStep, 50)
+
+        this.skillTransfer = new SkillCard(getText("yours_is_mine"), getText("grade"), getText("lost_strength"),
+            getText("yours_is_mine_info"), GameBaseLayer.skillSpriteCardWidth,
+            GameBaseLayer.skillSpriteCardHeight, 460, -130, GameBaseLayer.skillTransferTag,
+            res.skillTransfer_png)
+        this.addChild(this.skillTransfer, 50)
+
+        this.skillStorm.callback = cc.callFunc(this.skillClick, this)
+        this.skillStep.callback = cc.callFunc(this.skillClick, this)
+        this.skillTransfer.callback = cc.callFunc(this.skillClick, this)
+    },
+    showSkillSprites: function() {
+        if(!this.isSkillLayerShow)
+        {
+            this.skillStorm.runAction(cc.moveBy(0.3, cc.p(0,130)));
+            this.skillStep.runAction(cc.moveBy(0.3, cc.p(0,130)));
+            this.skillTransfer.runAction(cc.moveBy(0.3,cc.p(0,130)));
+            this.isSkillLayerShow = true;
+        }else
+        {
+            this.skillStorm.runAction(cc.moveBy(0.3, cc.p(0,-130)));
+            this.skillStep.runAction(cc.moveBy(0.3, cc.p(0,-130)));
+            this.skillTransfer.runAction(cc.moveBy(0.3, cc.p(0,-130)));
+            this.isSkillLayerShow = false;
+
+            if(this.isStepLayerShow)
+            {
+                this.showStepButton(!this.isStepLayerShow);
+                this.isStepLayerShow = !this.isStepLayerShow;
+            }
+        }
+    },
+    skillClick: function(node) {
+        playEffect(soundRes.click_01_wav, false)
+        var tag = node.getTag()
+        if (tag === GameBaseLayer.skillStormTag) {
+            if (this.player1.stop_x < 0) {
+                return
+            }
+            
+            var needLostStrength = 80 - this.player1.arrSkill[0] * 10
+            if (this.player1.strength >= needLostStrength) {
+                playEffect(soundRes.storm_mp3, false)
+                playEffectRandomly(this.arrPlayer1Effect4, false);
+                this.arrNextPlayerEffect = this.arrPlayer2Effect5;
+                this.scheduleOnce(this.playNextEffectArr, 2);
+                this.showSkillSprites();
+                this.player1.strength -= needLostStrength
+                this.refreshStrengthLabel(this.player1,0);
+
+                var pointOfGL = map2GL(cc.p(this.player1.stop_x, this.player1.stop_y), GameBaseLayer.map);
+
+                var rainSpriteFrames = this.player1.rainSkill.getAnimation().getFrames()
+                var rainSpriteFrame = rainSpriteFrames[0].getSpriteFrame()
+                this.rainSprite = cc.Sprite.create(rainSpriteFrame)
+                this.addChild(this.rainSprite)
+                this.rainSprite.setAnchorPoint(cc.p(0, 0))
+                this.rainSprite.setPosition(cc.p(pointOfGL.x - GameBaseLayer.tiledWidth / 2, pointOfGL.y + GameBaseLayer.tiledHeight / 2))
+                this.rainSprite.runAction(cc.sequence(obj.player2.rainSkill,
+                    cc.callFunc(function (target) {
+                        GameBaseLayer.landLayer.setTileGID(GameBaseLayer.blank_land_tiledID, cc.p(target.player2.stop_x, target.player2.stop_y))
+                        target.rainSprite.removeFromParent(true)
+                    }, this)))
+            } else {
+                var toast = new ToastLayer(getText("your_strength_is_low"), 2.0, cc.p(cc.winSize.width / 2, cc.winSize.height / 2), null)
+                this.addChild(toast)
+            }
+        }
+
+        if (tag === GameBaseLayer.skillStepTag) {
+            this.showStepButton(!this.isStepLayerShow)
+            this.isStepLayerShow = !this.isStepLayerShow
+        }
+
+        if (tag === GameBaseLayer.skillTransferTag) {
+            if (this.player1.stop_x < 0) {
+                return
+            }
+
+            var needLostStrength = 110 - this.player1.arrSkill[2] * 10
+            if(this.player1.strength >= needLostStrength)
+            {
+                playEffectRandomly(this.arrPlayer1Effect2, false)
+                this.arrNextPlayerEffect = this.arrPlayer2Effect3
+                this.scheduleOnce(this.playNextEffectArr, 2.0)
+                var transferLand = 0;
+                if(this.transferLandTag === config.eventTag.MSG_PAY_TOLLS_1_TAG)
+                {
+                    transferLand = GameBaseLayer.player1_building_1_tiledID;
+                }
+                if(this.transferLandTag === config.eventTag.MSG_PAY_TOLLS_2_TAG)
+                {
+                    transferLand = GameBaseLayer.player1_building_2_tiledID;
+                }
+                if(this.transferLandTag === config.eventTag.MSG_PAY_TOLLS_3_TAG)
+                {
+                    transferLand = GameBaseLayer.player1_building_3_tiledID;
+                }
+                this.transferLandTag = 0;
+                if(transferLand !== 0)
+                {
+                    this.showSkillSprites();
+                    this.player1.strength -= needLostStrength
+                    this.refreshStrengthLabel(this.player1,0);
+                    var pointOfGL = map2GL(cc.p(this.player1.stop_x,this.player1.stop_y), GameBaseLayer.map);
+
+                    var transferSpriteFrames = this.player1.transferSkill.getAnimation().getFrames()
+                    var transferSpriteFrame = transferSpriteFrames[0].getSpriteFrame()
+                    this.transferSprite = cc.sprite.create(transferSpriteFrame)
+                    this.addChild(this.transferSprite)
+                    this.transferSprite.setAnchorPoint(cc.p(0, 0))
+                    this.transferSprite.setPosition(pointOfGL)
+                    this.transferSprite.runAction(cc.sequence(this.player1.transferSkill,
+                        cc.callFunc(function (target, data) {
+                            GameBaseLayer.landLayer.setTileGID(data[0], cc.p(target.player1.stop_x, target.player1.stop_y))
+                            target.transferSprite.removeFromParent(true)
+                        }, this, [transferLand])))
+
+                }
+
+            }else
+            {
+                var toast = new ToastLayer(getText("your_strength_is_low"), 2.0, cc.p(cc.winSize.width / 2, cc.winSize.height / 2), null)
+                this.addChild(toast)
+            }
+        }
+    },
+    showStepButton: function(show) {
+        if(show)
+        {
+            this.btnStep1.setVisible(true);
+            this.btnStep2.setVisible(true);
+            this.btnStep3.setVisible(true);
+            this.btnStep4.setVisible(true);
+            this.btnStep5.setVisible(true);
+            this.btnStep6.setVisible(true);
+
+            this.btnStep2.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime, 60))
+            this.btnStep3.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 2, 120))
+            this.btnStep4.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 3, 180))
+            this.btnStep5.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 4, 240))
+            this.btnStep6.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 5, 300))
+        }else
+        {
+            this.btnStep2.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime, -60))
+            this.btnStep3.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 2, -120))
+            this.btnStep4.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 3, -180))
+            this.btnStep5.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 4, -240))
+            this.btnStep6.runAction(cc.sequence(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 5, -300),
+                cc.callFunc(function (target) {
+                    target.btnStep1.setVisible(false);
+                    target.btnStep2.setVisible(false);
+                    target.btnStep3.setVisible(false);
+                    target.btnStep4.setVisible(false);
+                    target.btnStep5.setVisible(false);
+                    target.btnStep6.setVisible(false);
+                }, this)))
+
+        }
     },
     // todo
     goButtonCallback: function (sender) {
         playEffect(soundRes.click_01_wav, false)
         var tag = sender.getTag()
         if (tag === GameBaseLayer.goButtonTag) {
+
+            if (this.isSkillLayerShow) {
+                this.showSkillSprites()
+            }
+
             var randNumber = ((Math.random() * 6) | 0) + 1
             RouteNavigation.getPath(this.player1, randNumber, GameBaseLayer.arrCanPassGrid, GameBaseLayer.tiledRowsCount, GameBaseLayer.tiledColsCount)
             var arrCol = RouteNavigation.arrPathCols
             var arrRow = RouteNavigation.arrPathRows
-
-            cc.log("arrRow: %o, arrCol: %o", arrRow, arrCol)
 
             var event = new cc.EventCustom(config.eventCustom.MSG_GO)
             event.setUserData(String(config.eventTag.MSG_GO_HIDE_TAG))
             cc.eventManager.dispatchEvent(event)
             this.player1.startGo(arrRow, arrCol)
         }
+        
+        if (tag === GameBaseLayer.skillButtonTag) {
+            this.skillStorm.skillGrade = this.player1.arrSkill[0]
+            this.skillStep.skillGrade = this.player1.arrSkill[1]
+            this.skillTransfer.skillGrade = this.player1.arrSkill[2]
 
+            this.skillStorm.strength = 80 - this.player1.arrSkill[0] * 10
+            this.skillStep.strength = 60 - this.player1.arrSkill[1] * 10
+            this.skillTransfer.strength = 110 - this.player1.arrSkill[2] * 10
+
+            this.showSkillSprites()
+        }
 
     },
     // todo
@@ -1963,6 +2166,10 @@ GameBaseLayer.step3_tag = 803
 GameBaseLayer.step4_tag = 804
 GameBaseLayer.step5_tag = 805
 GameBaseLayer.step6_tag = 806
+GameBaseLayer.skillSpriteCardWidth = 150
+GameBaseLayer.skillSpriteCardHeight = 100
+
+GameBaseLayer.stepSkillAnimaTime = 0.1
 
 GameBaseLayer.tiledColsCount = null
 GameBaseLayer.tiledRowsCount = null

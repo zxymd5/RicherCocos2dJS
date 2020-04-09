@@ -21,6 +21,7 @@
         "src/toastLayer.js",
         "src/stockCellCard.js",
         "src/stock.js",
+        "src/skillCard.js",
         "src/lineChart.js",
         "src/mapChooseScene.js",
         "src/stock.js",

@@ -63,8 +63,8 @@ var res = {
     skillBtnPressed_png: "res/images/skill_button_pressed.png",
     saveNormal_png: "res/map/save_normal.png",
     savePressed_png: "res/map/save_pressed.png",
-    backNormal_png: "res/images/back_normal.png",
-    backPressed_png: "res/images/back_pressed.png",
+    checkNormal_png: "res/images/check_normal.png",
+    checkPressed_png: "res/images/check_pressed.png",
     audioOn_png: "res/images/audio_on.png",
     audioOff_png: "res/images/audio_off.png",
     step1Normal_png: "res/images/step1_normal.png",
@@ -137,7 +137,10 @@ var res = {
     winParticle_plist: "res/images/win_particle.plist",
     win_png: "res/images/win.png",
     stars_png: "res/images/stars.png",
-    stars2_png: "res/images/stars2.png"
+    stars2_png: "res/images/stars2.png",
+    thunderstorm_png: "res/images/thunderstorm.png",
+    skillStep_png: "res/images/skill_step.png",
+    skillTransfer_png: "res/images/skill_transfer.png"
 };
 
 var soundRes = {
