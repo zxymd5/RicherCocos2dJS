@@ -117,13 +117,7 @@ var MenuLayer = cc.LayerColor.extend({
         popupDialog.addButton(cc.p(-320, -200), res.popupBtnBg1_png, res.popupBtnBg2_png, getText("ok"), tagRes.BtnOkTag, this.quitLayerCallback)
         popupDialog.addButton(cc.p(-70, -200), res.popupBtnBg1_png, res.popupBtnBg2_png, getText("cancel"), tagRes.BtnCancelTag, this.quitLayerCallback)
 
-        popupDialog.addButton2(cc.p(-200, -200), res.popupBtnBg1_png, res.popupBtnBg2_png, getText("cancel"), tagRes.BtnCancelTag)
-        popupDialog.callbackFunc2 = cc.callFunc(this.callbackFunc2, this)
         this.addChild(popupDialog)
-    },
-    callbackFunc2: function(sender) {
-        cc.log("sender.getTag: " + sender.getTag())
-        var m = 5
     }
 });
 

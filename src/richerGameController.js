@@ -37,17 +37,16 @@ var RicherGameController = cc.Layer.extend({
     startRealGo: function(arrRow, arrCol, richerPlayer) {
         this.currentRow = arrRow[0];
         this.currentCol = arrCol[0];
-        this.nextRow =0;
-        this.nextCol =0;
+        this.nextRow = 0;
+        this.nextCol = 0;
 
-        this.arrRow=arrRow;
-        this.arrCol=arrCol;
+        this.arrRow = arrRow;
+        this.arrCol = arrCol;
         this._richerPlayer =richerPlayer;
         this.stepHasGone = 0;
         this.stepsCount = arrRow.length - 1;
         this.moveOneStep(richerPlayer);
     },
-    // todo
     endGo: function() {
         GameBaseLayer.arrPathMark[this.stepHasGone].setVisible(false)
         this.stepHasGone++
@@ -62,23 +61,28 @@ var RicherGameController = cc.Layer.extend({
         this.currentRow = this.nextRow;
         this.currentCol = this.nextCol;
         var titleSize = GameBaseLayer.wayLayer.getLayerSize();
-        var passId = GameBaseLayer.wayLayer.getTileGIDAt(cc.p(this.currentCol,titleSize.height-this.currentRow-1));
-        // if(passId == GameBaseScene::lottery_tiledID)
-        // {
-        //     String * str = String::createWithFormat("%d-%f-%f-%d-%d",MSG_LOTTERY_TAG,1.0f,1.0f,_richerPlayer->getTag(),MOVEPASS);
-        //     NotificationCenter::getInstance()->postNotification(MSG_LOTTERY,str);
-        //     return;
-        // }
-        //
-        // if(passId == GameBaseScene::stock_tiledID)
-        // {
-        //     String * str = String::createWithFormat("%d-%f-%f-%d-%d",MSG_STOCK_TAG,1.0f,1.0f,_richerPlayer->getTag(),MOVEPASS);
-        //     NotificationCenter::getInstance()->postNotification(MSG_STOCK,str);
-        //     return;
-        // }
+        var passId = GameBaseLayer.wayLayer.getTileGIDAt(cc.p(this.currentCol,titleSize.height - this.currentRow - 1));
+        if(passId === GameBaseLayer.lottery_tiledID)
+        {
+            var msg = config.eventTag.MSG_LOTTERY_TAG + "-" + 1.0 + "-" + 1.0 + "-" + this._richerPlayer.getTag() + "-" + config.moveTag.MOVEPASS
+
+            var event = new cc.EventCustom(config.eventCustom.MSG_LOTTERY)
+            event.setUserData(msg)
+            cc.eventManager.dispatchEvent(event)
+            return;
+        }
+
+        if(passId === GameBaseLayer.stock_tiledID)
+        {
+            var msg = config.eventTag.MSG_STOCK_TAG + "-" + 1.0 + "-" + 1.0 + "-" + this._richerPlayer.getTag() + "-" + config.moveTag.MOVEPASS
+
+            var event = new cc.EventCustom(config.eventCustom.MSG_STOCK)
+            event.setUserData(msg)
+            cc.eventManager.dispatchEvent(event)
+            return;
+        }
 
         this.moveOneStep(this._richerPlayer);
-
     },
     registerNotificationObserver: function() {
         cc.eventManager.addListener(
@@ -127,10 +131,10 @@ var RicherGameController = cc.Layer.extend({
         }
         if(distanceRow < 0)//down
         {
-            this.moveBy = cc.moveBy(RicherGameController.playerGoTotalTime,cc.p(0,-GameBaseLayer.tiledHeight));
+            this.moveBy = cc.moveBy(RicherGameController.playerGoTotalTime, cc.p(0, -GameBaseLayer.tiledHeight));
             this.repeate = cc.repeat(richerPlayer.down,1);
         }
-        if(distanceCol >0)//right
+        if(distanceCol > 0)//right
         {
             this.moveBy = cc.moveBy(RicherGameController.playerGoTotalTime,cc.p(GameBaseLayer.tiledWidth,0));
             this.repeate = cc.repeat(richerPlayer.right,1);

@@ -192,7 +192,6 @@ var RicherPlayer = cc.Sprite.extend({
         this.rainSkill = cc.animate(cc.animationCache.getAnimation("rain_animation"))
         this.transferSkill = cc.animate(cc.animationCache.getAnimation("transfer_animation"))
     },
-    // todo
     startGo: function (arrRow, arrCol) {
         var fadeout = cc.fadeOut(0.2);
         var fadein = cc.fadeIn(0.2);

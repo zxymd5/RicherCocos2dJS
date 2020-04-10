@@ -2,6 +2,7 @@ var GameBaseLayer = cc.Layer.extend({
 
     btnGo: null,
     btnSkill: null,
+    btnAudio: null,
 
     map_level: null,
     saveJsonName: null,
@@ -116,21 +117,6 @@ var GameBaseLayer = cc.Layer.extend({
     initLayer: function () {
         GameBaseLayer.wayLayer = GameBaseLayer.map.getLayer("way")
         GameBaseLayer.landLayer = GameBaseLayer.map.getLayer("land")
-    },
-
-    initTiledGrid: function () {
-        GameBaseLayer.tiledColsCount = 22
-        GameBaseLayer.tiledRowsCount = 22
-        GameBaseLayer.arrCanPassGrid = new Array(22)
-        for (var i = 0; i < GameBaseLayer.tiledRowsCount; i++) {
-            GameBaseLayer.arrCanPassGrid[i] = new Array(22)
-        }
-
-        for (var i = 0; i < GameBaseLayer.tiledRowsCount; i++) {
-            for (var j = 0; j < GameBaseLayer.tiledColsCount; j++) {
-                GameBaseLayer.arrCanPassGrid[i][j] = false
-            }
-        }
     },
     initRandomAskEvent: function() {
         var arrEvent = ["tax_rebates", "pay_taxes", "loss_strength", "physical_recovery", "investment_dividends",
@@ -287,11 +273,11 @@ var GameBaseLayer = cc.Layer.extend({
         this.btnSkill.setTag(GameBaseLayer.skillButtonTag)
         menu.addChild(this.btnSkill)
 
-        var btnSave = new cc.MenuItemImage(res.saveNormal_png, res.savePressed_png, this.goButtonCallback, this)
-        btnSave.setPosition(cc.winSize.width, 0)
-        btnSave.setAnchorPoint(1, 0)
-        btnSave.setTag(GameBaseLayer.saveButtonTag)
-        menu.addChild(btnSave)
+        // var btnSave = new cc.MenuItemImage(res.saveNormal_png, res.savePressed_png, this.goButtonCallback, this)
+        // btnSave.setPosition(cc.winSize.width, 0)
+        // btnSave.setAnchorPoint(1, 0)
+        // btnSave.setTag(GameBaseLayer.saveButtonTag)
+        // menu.addChild(btnSave)
 
         var btnBack = new cc.MenuItemImage(res.backNormal_png, res.backPressed_png, this.backButtonCallback, this)
         btnBack.setPosition(20, cc.winSize.height - 2 * btnBack.height)
@@ -312,6 +298,7 @@ var GameBaseLayer = cc.Layer.extend({
             btnAudio.selected()
         }
         menu.addChild(btnAudio)
+        this.btnAudio = btnAudio
 
         var btnStep1 = new cc.MenuItemImage(res.step1Normal_png, res.step1Pressed_png, this.goButtonCallback, this)
         btnStep1.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
@@ -532,7 +519,6 @@ var GameBaseLayer = cc.Layer.extend({
 
         }
     },
-    // todo
     goButtonCallback: function (sender) {
         playEffect(soundRes.click_01_wav, false)
         var tag = sender.getTag()
@@ -565,12 +551,67 @@ var GameBaseLayer = cc.Layer.extend({
             this.showSkillSprites()
         }
 
+        if(tag === GameBaseLayer.step1_tag || tag === GameBaseLayer.step2_tag || tag === GameBaseLayer.step3_tag
+            || tag === GameBaseLayer.step4_tag || tag === GameBaseLayer.step5_tag || tag === GameBaseLayer.step6_tag)
+        {
+
+            var needLostStrength = 60 - this.player1.arrSkill[1] * 10;
+            if(this.player1.strength >= needLostStrength)
+            {
+                this.player1.length -= needLostStrength;
+                this.refreshStrengthLabel(this.player1,0);
+                this.showSkillSprites();
+
+                var steps = tag - GameBaseLayer.stepBaseTag
+                RouteNavigation.getPath(this.player1, steps, GameBaseLayer.arrCanPassGrid, GameBaseLayer.tiledRowsCount, GameBaseLayer.tiledColsCount)
+                var arrCol = RouteNavigation.arrPathCols
+                var arrRow = RouteNavigation.arrPathRows
+
+                var event = new cc.EventCustom(config.eventCustom.MSG_GO)
+                event.setUserData(String(config.eventTag.MSG_GO_HIDE_TAG))
+                cc.eventManager.dispatchEvent(event)
+                this.player1.startGo(arrRow, arrCol)
+
+            }else
+            {
+                var toast = new ToastLayer(getText("your_strength_is_low"), 2.0, cc.p(cc.winSize.width / 2, cc.winSize.height / 2), null)
+                this.addChild(toast)
+            }
+
+        }
+        if (tag === GameBaseLayer.audioButtonTag) {
+            var musicOn = cc.sys.localStorage.getItem("music_on")
+            if (musicOn !== "NO") {
+                cc.audioEngine.stopAllEffects()
+                cc.sys.localStorage.setItem("music_on", "NO")
+                this.btnAudio.selected()
+            } else {
+                playEffectRandomly(this.arrBgMusic, false)
+                cc.sys.localStorage.setItem("music_on", "YES")
+                this.btnAudio.unselected()
+            }
+        }
+
     },
-    // todo
     backButtonCallback: function () {
-        var event = new cc.EventCustom(config.eventCustom.MSG_GO)
-        event.setUserData("test msg go")
-        cc.eventManager.dispatchEvent(event)
+        var popupDialog = new PopupLayer(cc.p(cc.winSize.width / 2 - 200, cc.winSize.height / 2 - 110), cc.size(400, 220))
+        popupDialog.addBackground(res.dialogBg_png)
+
+        popupDialog.addLabel(cc.p(200, 190), getText("dialog_title"), "Arial", 25, config.popupLayer.titleTag)
+        popupDialog.addLabel(cc.p(200, 110), getText("dialog_content"), "Marker Felt", 20, config.popupLayer.contentTag)
+
+        popupDialog.addButton(cc.p(-320, -200), res.popupBtnBg1_png, res.popupBtnBg2_png, getText("ok"), tagRes.BtnOkTag, this.quitButtonCallback)
+        popupDialog.addButton(cc.p(-70, -200), res.popupBtnBg1_png, res.popupBtnBg2_png, getText("cancel"), tagRes.BtnCancelTag, this.quitButtonCallback)
+
+        this.addChild(popupDialog)
+    },
+    quitButtonCallback: function(node) {
+      playEffect(soundRes.click_wav, false)
+      if (node.getTag() === tagRes.BtnOkTag) {
+          cc.director.runScene(new MenuScene())
+      }  else {
+          node.getParent().getParent().removeFromParent()
+      }
     },
     addPlayerInfo: function () {
         var player1Logo = new cc.Sprite(res.player1_png)
@@ -847,7 +888,7 @@ var GameBaseLayer = cc.Layer.extend({
             }
             case config.eventTag.MSG_GO_SHOW_TAG:
             {
-                if(obj.gameRoundCount !== 0 && this.gameRoundCount % config.LOTTERY_ROUND_FREQUENTLY === 0)
+                if(obj.gameRoundCount !== 0 && obj.gameRoundCount % config.LOTTERY_ROUND_FREQUENTLY === 0)
                 {
                     obj.scheduleOnce(obj.popPublishLottery,2.0);
 
@@ -898,20 +939,20 @@ var GameBaseLayer = cc.Layer.extend({
                     {
                         obj.player1.isMyTurn = false
 
-                        var text = getText("in_hospital_remain") + " " + this.player1.restTimes + " " + getText("rich_day")
-                        var toast = new ToastLayer(text, 2.0, this.player1.getPosition(), cc.callFunc(function (target) {
+                        var text = getText("in_hospital_remain") + " " + obj.player1.restTimes + " " + getText("rich_day")
+                        var toast = new ToastLayer(text, 2.0, obj.player1.getPosition(), cc.callFunc(function (target) {
                             var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
                             event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
                             cc.eventManager.dispatchEvent(event)
                         }, obj))
-                        this.addChild(toast)
+                        obj.addChild(toast)
 
                         break;
                     }
                     case config.PLAYER_2_TAG:
                     {
                         obj.player2.isMyTurn = false
-                        var text = getText("in_hospital_remain") + " " + this.player2.restTimes + " " + getText("rich_day")
+                        var text = getText("in_hospital_remain") + " " + obj.player2.restTimes + " " + getText("rich_day")
                         var toast = new ToastLayer(text, 2.0, obj.player2.getPosition(), cc.callFunc(function (target) {
                             var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
                             event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
@@ -959,7 +1000,7 @@ var GameBaseLayer = cc.Layer.extend({
             case config.eventTag.MSG_LOTTERY_TAG:
             {
                 var playerTag = parseInt(arrMessage[3])
-                moveTag = parseInt(arrMessage[4])
+                obj.moveTag = parseInt(arrMessage[4])
                 switch (playerTag) {
                     case config.PLAYER_1_TAG:{
                         playEffect(soundRes.p1_need1000_wav, false)

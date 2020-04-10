@@ -1,4 +1,4 @@
-var BeachLayer = GameBaseLayer.extend({
+var SeaLayer = GameBaseLayer.extend({
     ctor: function () {
         this._super()
 
@@ -26,15 +26,15 @@ var BeachLayer = GameBaseLayer.extend({
 
     },
     addMap: function() {
-        GameBaseLayer.map = new cc.TMXTiledMap(res.beach_tmx)
+        GameBaseLayer.map = new cc.TMXTiledMap(res.sea_tmx)
         this.addChild(GameBaseLayer.map)
     },
     initTiledGrid: function () {
-        GameBaseLayer.tiledColsCount = 22
-        GameBaseLayer.tiledRowsCount = 22
-        GameBaseLayer.arrCanPassGrid = new Array(22)
+        GameBaseLayer.tiledColsCount = 20
+        GameBaseLayer.tiledRowsCount = 15
+        GameBaseLayer.arrCanPassGrid = new Array(15)
         for (var i = 0; i < GameBaseLayer.tiledRowsCount; i++) {
-            GameBaseLayer.arrCanPassGrid[i] = new Array(22)
+            GameBaseLayer.arrCanPassGrid[i] = new Array(20)
         }
 
         for (var i = 0; i < GameBaseLayer.tiledRowsCount; i++) {
@@ -61,15 +61,15 @@ var BeachLayer = GameBaseLayer.extend({
         GameBaseLayer.player1_building_2_tiledID = 14;
         GameBaseLayer.player1_building_3_tiledID = 15;
 
-        this.map_level = 1;
-        this.saveJsonName = "beach_save.json";
+        this.map_level = 2;
+        this.saveJsonName = "sea_save.json";
     }
 })
 
-var BeachScene = cc.Scene.extend({
+var SeaScene = cc.Scene.extend({
     onEnter: function () {
         this._super()
-        var layer = new BeachLayer()
+        var layer = new SeaLayer()
         this.addChild(layer)
     }
 });

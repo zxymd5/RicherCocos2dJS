@@ -24,7 +24,6 @@
         "src/skillCard.js",
         "src/lineChart.js",
         "src/mapChooseScene.js",
-        "src/stock.js",
         "src/lineChart.js",
         "src/richerPlayer.js",
         "src/item.js",
@@ -39,6 +38,8 @@
         "src/customizedPopupLayer.js",
         "src/gameBaseLayer.js",
         "src/beachScene.js",
+        "src/seaScene.js",
+        "src/snowScene.js",
         "src/routeNavigation.js",
         "src/richerGameController.js"
     ]

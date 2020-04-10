@@ -49,7 +49,7 @@ var MapChooseLayer = cc.Layer.extend({
     onChooseMap: function (sender) {
         switch (sender.getTag()) {
             case tagRes.SeaMapTag: {
-                var scene = new cc.TransitionFadeBL(1.5, new BeachScene())
+                var scene = new cc.TransitionFadeBL(1.5, new SeaScene())
                 cc.director.pushScene(scene)
             }
                 break;
@@ -59,7 +59,8 @@ var MapChooseLayer = cc.Layer.extend({
             }
                 break;
             case tagRes.SnowMapTag: {
-                cc.director.pushScene(new BeachScene())
+                var scene = new cc.TransitionFadeBL(1.5, new SnowScene())
+                cc.director.pushScene(scene)
             }
                 break;
             default:
