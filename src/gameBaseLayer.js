@@ -1902,7 +1902,6 @@ var GameBaseLayer = cc.Layer.extend({
         crabPos.x += this.itemCrab.width / 2
         crabPos.y -= this.itemCrab.height / 2
 
-        // if (player.getBoundingBox().containsPoint(crabPos)) {
         if (cc.rectContainsPoint(player.getBoundingBox(), crabPos)) {
             playEffect(soundRes.m120_mp3, false)
             if (player.getTag() === config.PLAYER_2_TAG) {

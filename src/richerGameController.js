@@ -149,7 +149,6 @@ var RicherGameController = cc.Layer.extend({
         richerPlayer.runAction(this.spawnAction);
 
     },
-    // todo
     receivedMsg: function (event) {
         var retMsgType = parseInt(event.getUserData())
         var obj = event.getCurrentTarget()
@@ -205,25 +204,48 @@ var RicherGameController = cc.Layer.extend({
 
                  if(player.stop_x > 0) {
                      var gid = GameBaseLayer.landLayer.getTileGIDAt(cc.p(player.stop_x, player.stop_y))
-                     if (gid != GameBaseLayer.blank_land_tiledID && gid != GameBaseLayer.player2_building_1_tiledID &&
-                        gid != GameBaseLayer.player2_building_2_tiledID && gid != GameBaseLayer.player2_building_3_tiledID)
+                     if (gid !== GameBaseLayer.blank_land_tiledID && gid !== GameBaseLayer.player2_building_1_tiledID &&
+                        gid !== GameBaseLayer.player2_building_2_tiledID && gid !== GameBaseLayer.player2_building_3_tiledID)
                      {
                          var playerStrength = player.strength;
                          var randomSkill_index = ((Math.random() * 3) | 0);
                          var needLostStrength = 0;
                          var landLevel = 0;
-                         if(gid == GameBaseScene.player1_building_1_tiledID)
+                         if(gid === GameBaseScene.player1_building_1_tiledID)
                          {
                              landLevel =  GameBaseScene.player2_building_1_tiledID;
                          }
-                         if(gid == GameBaseScene.player1_building_2_tiledID)
+                         if(gid === GameBaseScene.player1_building_2_tiledID)
                          {
                              landLevel =  GameBaseScene.player2_building_2_tiledID;
                          }
-                         if(gid == GameBaseScene.player1_building_3_tiledID)
+                         if(gid === GameBaseScene.player1_building_3_tiledID)
                          {
                              landLevel =  GameBaseScene.player2_building_3_tiledID;
                          }
+
+                         switch (randomSkill_index) {
+                             case 0:
+                             {
+                                 needLostStrength = 80 - player.arrSkill[0] * 10
+                                 break
+                             }
+                             case 2:
+                             {
+                                 needLostStrength = 110 - player.arrSkill[2] * 10
+                                 break
+                             }
+                         }
+                         if (playerStrength >= needLostStrength) {
+                             var msg = config.eventTag.MSG_USE_SKILL_TAG + "-" + player.stop_x + "-"
+                                        + player.stop_y + "-" + player.getTag() + "-" + randomSkill_index
+                                        + "-" + needLostStrength + "-" + landLevel
+                             var event = new cc.EventCustom(config.eventCustom.MSG_USE_SKILL)
+                             event.setUserData(msg)
+                             cc.eventManager.dispatchEvent(event)
+                             return;
+                         }
+
                      }
                  }
 
