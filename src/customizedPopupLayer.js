@@ -238,15 +238,17 @@ var CustomizedPopupLayer = cc.Layer.extend({
     },
     refreshBallBackGround: function (node) {
         var nodeTag = node.getTag()
-        for (var i = 0; i < this.arrLottery.length; i++) {
-            var lotteryCardTag = this.arrLottery[i].getTag()
+        var layer = node.getParent().getParent().getParent().getParent()
+
+        for (var i = 0; i < layer.arrPlayerLottery.length; i++) {
+            var lotteryCardTag = layer.arrPlayerLottery[i].getTag()
 
             if (nodeTag !== lotteryCardTag) {
                 node.unselected()
             }
         }
-        this.lotterySelected = nodeTag
-        arrMenuItem = this.menu.getChildren()
+        layer.lotterySelected = nodeTag
+        arrMenuItem = layer.menu.getChildren()
         for (var i = 0; i< arrMenuItem.length; i++) {
             if (arrMenuItem[i].getTag() !== 0) {
                 arrMenuItem[i].setTag(nodeTag)

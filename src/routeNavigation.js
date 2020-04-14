@@ -15,8 +15,8 @@ var RouteNavigation = {
         var currentCol, currentRow
         var x = player.getPositionX()
         var y = player.getPositionY()
-        currentCol = x / GameBaseLayer.tiledHeight
-        currentRow = (y - GameBaseLayer.tiledWidth) / GameBaseLayer.tiledWidth
+        currentCol = Math.round(x / GameBaseLayer.tiledHeight)
+        currentRow = Math.round((y - GameBaseLayer.tiledWidth) / GameBaseLayer.tiledWidth)
 
         this.arrPathCols.push(currentCol)
         this.arrPathRows.push(currentRow)

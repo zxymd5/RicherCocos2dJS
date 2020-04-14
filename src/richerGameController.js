@@ -197,7 +197,7 @@ var RicherGameController = cc.Layer.extend({
 
                 if (player.getTag() === config.PLAYER_1_TAG) {
                     var event = new cc.EventCustom(config.eventCustom.MSG_GO)
-                    event.setUserData(String(config.eventTag.MSG_GO_HIDE_TAG))
+                    event.setUserData(String(config.eventTag.MSG_GO_SHOW_TAG))
                     cc.eventManager.dispatchEvent(event)
                     return;
                 }
@@ -211,17 +211,17 @@ var RicherGameController = cc.Layer.extend({
                          var randomSkill_index = ((Math.random() * 3) | 0);
                          var needLostStrength = 0;
                          var landLevel = 0;
-                         if(gid === GameBaseScene.player1_building_1_tiledID)
+                         if(gid === GameBaseLayer.player1_building_1_tiledID)
                          {
-                             landLevel =  GameBaseScene.player2_building_1_tiledID;
+                             landLevel =  GameBaseLayer.player2_building_1_tiledID;
                          }
-                         if(gid === GameBaseScene.player1_building_2_tiledID)
+                         if(gid === GameBaseLayer.player1_building_2_tiledID)
                          {
-                             landLevel =  GameBaseScene.player2_building_2_tiledID;
+                             landLevel =  GameBaseLayer.player2_building_2_tiledID;
                          }
-                         if(gid === GameBaseScene.player1_building_3_tiledID)
+                         if(gid === GameBaseLayer.player1_building_3_tiledID)
                          {
-                             landLevel =  GameBaseScene.player2_building_3_tiledID;
+                             landLevel = GameBaseLayer.player2_building_3_tiledID;
                          }
 
                          switch (randomSkill_index) {

@@ -1349,30 +1349,33 @@ var GameBaseLayer = cc.Layer.extend({
     lotteryButtonCallback: function(node) {
         if (node.getTag() !== -1 && node.getTag() !== tagRes.BtnCancelTag) {
             playEffect(soundRes.p1_byelottery_wav, false)
-            this.player1.arrLottery.push(node.getTag())
-            this.refreshMoneyLabel(this.player1, -1000)
 
-            if (this.moveTag === config.moveTag.GOEND) {
+            var layer = node.getParent().getParent().getParent()
+
+            layer.player1.arrLottery.push(node.getTag())
+            layer.refreshMoneyLabel(layer.player1, -1000)
+
+            if (layer.moveTag === config.moveTag.GOEND) {
                 var msg = getText("buy_lottery") + " 10000"
-                var toast = new ToastLayer(msg, 2.0, this.player1.getPosition(), cc.callFunc(function (target) {
+                var toast = new ToastLayer(msg, 2.0, layer.player1.getPosition(), cc.callFunc(function (target) {
                     var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
                     event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
                     cc.eventManager.dispatchEvent(event)
-                }, this))
-                this.addChild(toast)
-            } else if (this.moveTag === config.moveTag.MOVEPASS) {
+                }, layer))
+                layer.addChild(toast)
+            } else if (layer.moveTag === config.moveTag.MOVEPASS) {
                 var msg = getText("buy_lottery") + " 10000"
-                var toast = new ToastLayer(msg, 2.0, this.player1.getPosition(), cc.callFunc(function (target) {
+                var toast = new ToastLayer(msg, 2.0, layer.player1.getPosition(), cc.callFunc(function (target) {
                     var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
                     event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
                     cc.eventManager.dispatchEvent(event)
-                }, this))
-                this.addChild(toast)
+                }, layer))
+                layer.addChild(toast)
             }
             node.getParent().getParent().removeFromParent()
         } else {
             node.getParent().getParent().removeFromParent()
-            if (this.moveTag === config.moveTag.GOEND) {
+            if (layer.moveTag === config.moveTag.GOEND) {
                 var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
                 event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
                 cc.eventManager.dispatchEvent(event)
@@ -1506,8 +1509,8 @@ var GameBaseLayer = cc.Layer.extend({
         }
     },
     showGoButton: function() {
-        this.btnGo.runAction(cc.moveBy(0.3, cc.p(-obj.btnGo.width * 2, 0)))
-        this.btnSkill.runAction(cc.moveBy(0.3, cc.p(-obj.btnSkill.width * 2, 0)))
+        this.btnGo.runAction(cc.moveBy(0.3, cc.p(-this.btnGo.width * 2, 0)))
+        this.btnSkill.runAction(cc.moveBy(0.3, cc.p(-this.btnSkill.width * 2, 0)))
     },
     refreshRoundDisplay: function () {
         for (var i = 0; i < this.arrRefreshRound.length; i++) {
@@ -1523,11 +1526,11 @@ var GameBaseLayer = cc.Layer.extend({
             this.addChild(st)
             this.arrRefreshRound.push(st)
         }
-        while (count != 0) {
+        while (count !== 0) {
             st = cc.Sprite.create(this.arrDigiteRound[count%10]);
             this.addChild(st);
             this.arrRefreshRound.push(st)
-            count = count/10;
+            count = (count/10) | 0;
         }
         this.arrRefreshRound.reverse()
 
@@ -2131,21 +2134,21 @@ var GameBaseLayer = cc.Layer.extend({
     },
     refreshMoneyLabel: function (player, money) {
         var tag = player.getTag()
-        player.money = money
+        player.money += money
         var strMoney
         if (tag === config.PLAYER_1_TAG) {
-            strMoney = "$ " + money
+            strMoney = "$ " + player.money
             this.player1_money_label.setString(strMoney)
         }
         if (tag === config.PLAYER_2_TAG) {
-            strMoney = "$ " + money
+            strMoney = "$ " + player.money
             this.player2_money_label.setString(strMoney)
         }
     },
     refreshStrengthLabel: function(player, strength) {
         var tag = player.getTag();
         var totalStrength = player.strength + strength;
-        if(totalStrength > 100) totalStrength = 100;
+        // if(totalStrength > 100) totalStrength = 100;
         if(totalStrength < 0) totalStrength = 0;
         player.strength = totalStrength
 
