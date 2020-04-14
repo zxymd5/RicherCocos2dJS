@@ -1126,7 +1126,7 @@ var GameBaseLayer = cc.Layer.extend({
                                     var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
                                     event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
                                     cc.eventManager.dispatchEvent(event)
-                            }, obj)))
+                            }, this)))
                             break
                         }
                         case 2:
@@ -1146,7 +1146,7 @@ var GameBaseLayer = cc.Layer.extend({
                                     var event = new cc.EventCustom(config.eventCustom.MSG_PICKONE_TOGO)
                                     event.setUserData(String(config.eventTag.MSG_PICKONE_TOGO_TAG))
                                     cc.eventManager.dispatchEvent(event)
-                                }, obj, [landLevel])))
+                                }, this, [landLevel])))
                             break
                         }
                     }
@@ -1479,7 +1479,7 @@ var GameBaseLayer = cc.Layer.extend({
                 this.itemStrengthUp.setPosition(cc.p(this.player1.x - 5, this.player1.y))
                 var action = cc.sequence(this.itemStrengthUp.normalAnim,
                     cc.callFunc(function (target) {
-                        target.itemStrengthUp.setVisible(false)
+                        target.setVisible(false)
                     }, this))
                 this.itemStrengthUp.runAction(action)
                 var toast = new ToastLayer(getText("strength_up") + " " + strengthValue, 2.0, this.player1.getPosition(), null)
@@ -1494,7 +1494,7 @@ var GameBaseLayer = cc.Layer.extend({
                 this.itemStrengthUp.setPosition(cc.p(this.player2.x, this.player2.y))
                 var action = cc.sequence(this.itemStrengthUp.normalAnim,
                     cc.callFunc(function (target) {
-                        target.itemStrengthUp.setVisible(false)
+                        target.setVisible(false)
                     }, this))
                 this.itemStrengthUp.runAction(action)
                 var toast = new ToastLayer(getText("strength_up") + " " + strengthValue, 2.0, this.player2.getPosition(), null)
@@ -1860,10 +1860,10 @@ var GameBaseLayer = cc.Layer.extend({
         var pointOfMap = cc.p(x, y)
         landSprite.runAction(cc.sequence(this.scaleby1ForBuyLand, this.scaleby2ForBuyLand,
             cc.callFunc(function (target, data) {
-                target.playParticle(data[1], data[8])
+                target.getParent().playParticle(data[1], data[8])
                 data[2].setVisible(false)
                 GameBaseLayer.landLayer.setTileGID(data[3], cc.p(x, y))
-                target.refreshMoneyLabel(data[6], data[7])
+                target.getParent().refreshMoneyLabel(data[6], data[7])
             }, this, [pointOfMap, pointOfGL, landSprite, landLevel, x, y, player, money, particlelistName])))
     },
     registerBlockWaySchedule: function () {

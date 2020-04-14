@@ -26,9 +26,9 @@ var CustomizedPopupLayer = cc.Layer.extend({
     ctor: function () {
         this._super()
 
-        this.setContentSize(cc.SizeZero())
+        this.setContentSize(cc.size(0, 0))
         this.menu = new cc.Menu()
-        this.menu.setPosition(cc.POINT_ZERO)
+        this.menu.setPosition(cc.p(0, 0))
         this.touchListener = cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,

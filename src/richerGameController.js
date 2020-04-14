@@ -168,7 +168,7 @@ var RicherGameController = cc.Layer.extend({
 
         if(retMsgType === config.eventTag.MSG_MOVE_ONE_STEP_TAG)
         {
-            obj.moveOneStep(this._richerPlayer)
+            obj.moveOneStep(obj._richerPlayer)
         }
     },
     pickOnePlayerToGo: function() {

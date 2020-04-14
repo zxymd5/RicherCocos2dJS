@@ -21,7 +21,7 @@ var playEffectRandomly = function(arrFilePath, loop) {
 }
 
 var map2GL = function(ptMap, map) {
-    var ptUI;
+    var ptUI = {x: 0, y: 0};
     ptUI.x = ptMap.x * map.getTileSize().width;
     ptUI.y = (ptMap.y + 1)* map.getTileSize().height;
 

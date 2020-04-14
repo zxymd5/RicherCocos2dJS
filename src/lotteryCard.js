@@ -15,8 +15,8 @@ var LotteryCard = cc.Sprite.extend({
     cardInit: function(numbers, width, height, cardSpriteX, cardSpriteY)
     {
         this.lotteryNumber = numbers
-        var layerColorBG = new cc.LayerColor(cc.color(100,100,100,255), width - 5, height - 5)
-        layerColorBG.setPosition(cc.p(cardSpriteX, cardSpriteY))
+        this.layerColorBG = new cc.LayerColor(cc.color(100,100,100,255), width - 5, height - 5)
+        this.layerColorBG.setPosition(cc.p(cardSpriteX, cardSpriteY))
         if (this.lotteryNumber > 0) {
             this.ballMenuImage = new cc.MenuItemImage(res.ltDefaultBall_png, res.ltBullBall_png, this.ballButtonCallback, this)
             this.ballMenuImage.setTag(this.lotteryNumber)

@@ -251,34 +251,34 @@ var LineChart = cc.LayerColor.extend({
     },
     initMenu: function() {
         this.menu = new cc.Menu()
-        this.menu.setPosition(cc.PointZero())
+        this.menu.setPosition(cc.p(0,0))
 
         var buyMenuItem = new cc.MenuItemImage(res.buyNormal_png, res.buyPressed_png, this.buttonCallback, this);
         buyMenuItem.setPosition(cc.p(700, cc.winSize.height - 110))
-        buyMenuItem.setAnchorPoint(cc.POINT_ZERO)
+        buyMenuItem.setAnchorPoint(cc.p(0,0))
         buyMenuItem.setTag(LineChart.buyButton)
         this.menu.addChild(buyMenuItem)
 
         var sellMenuItem = new cc.MenuItemImage(res.sellNormal_png, res.sellPressed_png, this.buttonCallback, this);
         sellMenuItem.setPosition(cc.p(700, cc.winSize.height - 180))
-        sellMenuItem.setAnchorPoint(cc.POINT_ZERO)
+        sellMenuItem.setAnchorPoint(cc.p(0,0))
         sellMenuItem.setTag(LineChart.sellButton)
         this.menu.addChild(sellMenuItem)
 
         var backMenuItem = new cc.MenuItemImage(res.backNormal_png, res.backPressed_png, this.buttonCallback, this);
         backMenuItem.setPosition(cc.p(700, cc.winSize.height - 250))
-        backMenuItem.setAnchorPoint(cc.POINT_ZERO)
+        backMenuItem.setAnchorPoint(cc.p(0,0))
         backMenuItem.setTag(LineChart.backButton)
         this.menu.addChild(backMenuItem)
 
         this.leftArrow = new cc.Sprite(res.arrowLeft_png)
         this.leftArrow.setPosition(cc.p(-500, -500))
-        this.leftArrow.setAnchorPoint(cc.POINT_ZERO)
+        this.leftArrow.setAnchorPoint(cc.p(0,0))
         this.addChild(this.leftArrow)
 
         this.rightArrow = new cc.Sprite(res.arrowRight_png)
         this.rightArrow.setPosition(cc.p(-500, -500))
-        this.rightArrow.setAnchorPoint(cc.POINT_ZERO)
+        this.rightArrow.setAnchorPoint(cc.p(0,0))
         this.addChild(this.rightArrow)
 
     },
