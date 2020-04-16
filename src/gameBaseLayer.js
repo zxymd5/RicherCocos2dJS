@@ -510,12 +510,12 @@ var GameBaseLayer = cc.Layer.extend({
             this.btnStep5.runAction(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 4, -240))
             this.btnStep6.runAction(cc.sequence(cc.rotateBy(GameBaseLayer.stepSkillAnimaTime * 5, -300),
                 cc.callFunc(function (target) {
-                    target.btnStep1.setVisible(false);
-                    target.btnStep2.setVisible(false);
-                    target.btnStep3.setVisible(false);
-                    target.btnStep4.setVisible(false);
-                    target.btnStep5.setVisible(false);
-                    target.btnStep6.setVisible(false);
+                    target.getParent().getParent().btnStep1.setVisible(false);
+                    target.getParent().getParent().btnStep2.setVisible(false);
+                    target.getParent().getParent().btnStep3.setVisible(false);
+                    target.getParent().getParent().btnStep4.setVisible(false);
+                    target.getParent().getParent().btnStep5.setVisible(false);
+                    target.getParent().getParent().btnStep6.setVisible(false);
                 }, this)))
 
         }
