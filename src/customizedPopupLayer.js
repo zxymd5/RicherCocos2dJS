@@ -171,7 +171,8 @@ var CustomizedPopupLayer = cc.Layer.extend({
         var event = new cc.EventCustom(config.eventCustom.MSG_DIMISS_DIALOG)
         event.setUserData(String(config.eventTag.MSG_DIMISS_DIALOG_PUBLISH_LOTTERY_TAG))
         cc.eventManager.dispatchEvent(event)
-        this.setVisible(false)
+        // this.setVisible(false)
+        this.removeFromParent()
     },
     setHasSelectedLotteryNumber: function(arrNum) {
         for (var i = 0; i < arrNum.length; i++) {
@@ -223,7 +224,7 @@ var CustomizedPopupLayer = cc.Layer.extend({
         }
 
         for (var j = 0; j < this.arrPlayers.length; j++) {
-            var player = this.arrPlayers[i]
+            var player = this.arrPlayers[j]
             this.arrPlayerLottery = []
             for (var i = 0; i < player.arrLottery.length; i++) {
                 var lblLotteryNumber = new cc.LabelTTF(String(player.arrLottery[i]), "", 15)
@@ -310,6 +311,7 @@ var CustomizedPopupLayer = cc.Layer.extend({
             this.backgroundScale9.setContentSize(this.getContentSize())
             this.backgroundScale9.setPosition(cc.p(cc.winSize.width / 2, cc.winSize.height / 2))
             this.addChild(this.backgroundScale9, 0, 0)
+
             contentSize = this.getContentSize()
         }
 
@@ -356,6 +358,7 @@ var CustomizedPopupLayer = cc.Layer.extend({
                     this.lblContent.setColor(cc.color(0,0,0));
                     this.addChild(this.lblContent)
                 }
+                break
             }
         }
 

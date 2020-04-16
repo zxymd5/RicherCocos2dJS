@@ -413,14 +413,14 @@ var RicherGameController = cc.Layer.extend({
         }
         if (endId === GameBaseLayer.lottery_tiledID) {
             var event = new cc.EventCustom(config.eventCustom.MSG_LOTTERY)
-            var data =  config.eventTag.MSG_LOTTERY_TAG + "-" + pointInMap.x + "-" + pointInMap.y + "-" + this._richerPlayer.getTag()
+            var data =  config.eventTag.MSG_LOTTERY_TAG + "-" + pointInMap.x + "-" + pointInMap.y + "-" + this._richerPlayer.getTag() + "-" + config.moveTag.GOEND
             event.setUserData(data)
             cc.eventManager.dispatchEvent(event)
             return
         }
         if (endId === GameBaseLayer.stock_tiledID) {
             var event = new cc.EventCustom(config.eventCustom.MSG_STOCK)
-            var data =  config.eventTag.MSG_STOCK_TAG + "-" + pointInMap.x + "-" + pointInMap.y + "-" + this._richerPlayer.getTag()
+            var data =  config.eventTag.MSG_STOCK_TAG + "-" + pointInMap.x + "-" + pointInMap.y + "-" + this._richerPlayer.getTag() + "-" + config.moveTag.GOEND
             event.setUserData(data)
             cc.eventManager.dispatchEvent(event)
             return

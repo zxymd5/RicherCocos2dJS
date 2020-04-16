@@ -394,95 +394,96 @@ var GameBaseLayer = cc.Layer.extend({
     skillClick: function(node) {
         playEffect(soundRes.click_01_wav, false)
         var tag = node.getTag()
+        var layer = node.getParent().getParent().getParent().getParent()
         if (tag === GameBaseLayer.skillStormTag) {
-            if (this.player1.stop_x < 0) {
+            if (layer.player1.stop_x < 0) {
                 return
             }
             
-            var needLostStrength = 80 - this.player1.arrSkill[0] * 10
-            if (this.player1.strength >= needLostStrength) {
+            var needLostStrength = 80 - layer.player1.arrSkill[0] * 10
+            if (layer.player1.strength >= needLostStrength) {
                 playEffect(soundRes.storm_mp3, false)
-                playEffectRandomly(this.arrPlayer1Effect4, false);
-                this.arrNextPlayerEffect = this.arrPlayer2Effect5;
-                this.scheduleOnce(this.playNextEffectArr, 2);
-                this.showSkillSprites();
-                this.player1.strength -= needLostStrength
-                this.refreshStrengthLabel(this.player1,0);
+                playEffectRandomly(layer.arrPlayer1Effect4, false);
+                layer.arrNextPlayerEffect = layer.arrPlayer2Effect5;
+                layer.scheduleOnce(layer.playNextEffectArr, 2);
+                layer.showSkillSprites();
+                layer.player1.strength -= needLostStrength
+                layer.refreshStrengthLabel(layer.player1,0);
 
-                var pointOfGL = map2GL(cc.p(this.player1.stop_x, this.player1.stop_y), GameBaseLayer.map);
+                var pointOfGL = map2GL(cc.p(layer.player1.stop_x, layer.player1.stop_y), GameBaseLayer.map);
 
-                var rainSpriteFrames = this.player1.rainSkill.getAnimation().getFrames()
+                var rainSpriteFrames = layer.player1.rainSkill.getAnimation().getFrames()
                 var rainSpriteFrame = rainSpriteFrames[0].getSpriteFrame()
-                this.rainSprite = cc.Sprite.create(rainSpriteFrame)
-                this.addChild(this.rainSprite)
-                this.rainSprite.setAnchorPoint(cc.p(0, 0))
-                this.rainSprite.setPosition(cc.p(pointOfGL.x - GameBaseLayer.tiledWidth / 2, pointOfGL.y + GameBaseLayer.tiledHeight / 2))
-                this.rainSprite.runAction(cc.sequence(obj.player2.rainSkill,
+                layer.rainSprite = cc.Sprite.create(rainSpriteFrame)
+                layer.addChild(layer.rainSprite)
+                layer.rainSprite.setAnchorPoint(cc.p(0, 0))
+                layer.rainSprite.setPosition(cc.p(pointOfGL.x - GameBaseLayer.tiledWidth / 2, pointOfGL.y + GameBaseLayer.tiledHeight / 2))
+                layer.rainSprite.runAction(cc.sequence(layer.player2.rainSkill,
                     cc.callFunc(function (target) {
                         GameBaseLayer.landLayer.setTileGID(GameBaseLayer.blank_land_tiledID, cc.p(target.player2.stop_x, target.player2.stop_y))
                         target.rainSprite.removeFromParent(true)
-                    }, this)))
+                    }, layer)))
             } else {
                 var toast = new ToastLayer(getText("your_strength_is_low"), 2.0, cc.p(cc.winSize.width / 2, cc.winSize.height / 2), null)
-                this.addChild(toast)
+                layer.addChild(toast)
             }
         }
 
         if (tag === GameBaseLayer.skillStepTag) {
-            this.showStepButton(!this.isStepLayerShow)
-            this.isStepLayerShow = !this.isStepLayerShow
+            layer.showStepButton(!layer.isStepLayerShow)
+            layer.isStepLayerShow = !layer.isStepLayerShow
         }
 
         if (tag === GameBaseLayer.skillTransferTag) {
-            if (this.player1.stop_x < 0) {
+            if (layer.player1.stop_x < 0) {
                 return
             }
 
-            var needLostStrength = 110 - this.player1.arrSkill[2] * 10
-            if(this.player1.strength >= needLostStrength)
+            var needLostStrength = 110 - layer.player1.arrSkill[2] * 10
+            if(layer.player1.strength >= needLostStrength)
             {
-                playEffectRandomly(this.arrPlayer1Effect2, false)
-                this.arrNextPlayerEffect = this.arrPlayer2Effect3
-                this.scheduleOnce(this.playNextEffectArr, 2.0)
+                playEffectRandomly(layer.arrPlayer1Effect2, false)
+                layer.arrNextPlayerEffect = layer.arrPlayer2Effect3
+                layer.scheduleOnce(layer.playNextEffectArr, 2.0)
                 var transferLand = 0;
-                if(this.transferLandTag === config.eventTag.MSG_PAY_TOLLS_1_TAG)
+                if(layer.transferLandTag === config.eventTag.MSG_PAY_TOLLS_1_TAG)
                 {
                     transferLand = GameBaseLayer.player1_building_1_tiledID;
                 }
-                if(this.transferLandTag === config.eventTag.MSG_PAY_TOLLS_2_TAG)
+                if(layer.transferLandTag === config.eventTag.MSG_PAY_TOLLS_2_TAG)
                 {
                     transferLand = GameBaseLayer.player1_building_2_tiledID;
                 }
-                if(this.transferLandTag === config.eventTag.MSG_PAY_TOLLS_3_TAG)
+                if(layer.transferLandTag === config.eventTag.MSG_PAY_TOLLS_3_TAG)
                 {
                     transferLand = GameBaseLayer.player1_building_3_tiledID;
                 }
-                this.transferLandTag = 0;
+                layer.transferLandTag = 0;
                 if(transferLand !== 0)
                 {
-                    this.showSkillSprites();
-                    this.player1.strength -= needLostStrength
-                    this.refreshStrengthLabel(this.player1,0);
-                    var pointOfGL = map2GL(cc.p(this.player1.stop_x,this.player1.stop_y), GameBaseLayer.map);
+                    layer.showSkillSprites();
+                    layer.player1.strength -= needLostStrength
+                    layer.refreshStrengthLabel(layer.player1,0);
+                    var pointOfGL = map2GL(cc.p(layer.player1.stop_x,layer.player1.stop_y), GameBaseLayer.map);
 
-                    var transferSpriteFrames = this.player1.transferSkill.getAnimation().getFrames()
+                    var transferSpriteFrames = layer.player1.transferSkill.getAnimation().getFrames()
                     var transferSpriteFrame = transferSpriteFrames[0].getSpriteFrame()
-                    this.transferSprite = cc.sprite.create(transferSpriteFrame)
-                    this.addChild(this.transferSprite)
-                    this.transferSprite.setAnchorPoint(cc.p(0, 0))
-                    this.transferSprite.setPosition(pointOfGL)
-                    this.transferSprite.runAction(cc.sequence(this.player1.transferSkill,
+                    layer.transferSprite = cc.sprite.create(transferSpriteFrame)
+                    layer.addChild(layer.transferSprite)
+                    layer.transferSprite.setAnchorPoint(cc.p(0, 0))
+                    layer.transferSprite.setPosition(pointOfGL)
+                    layer.transferSprite.runAction(cc.sequence(layer.player1.transferSkill,
                         cc.callFunc(function (target, data) {
                             GameBaseLayer.landLayer.setTileGID(data[0], cc.p(target.player1.stop_x, target.player1.stop_y))
                             target.transferSprite.removeFromParent(true)
-                        }, this, [transferLand])))
+                        }, layer, [transferLand])))
 
                 }
 
             }else
             {
                 var toast = new ToastLayer(getText("your_strength_is_low"), 2.0, cc.p(cc.winSize.width / 2, cc.winSize.height / 2), null)
-                this.addChild(toast)
+                layer.addChild(toast)
             }
         }
     },
@@ -735,6 +736,14 @@ var GameBaseLayer = cc.Layer.extend({
             cc.EventListener.create({
                 event: cc.EventListener.CUSTOM,
                 target: this,
+                eventName: config.eventCustom.MSG_DIMISS_DIALOG,
+                callback: this.receivedNotificationOMsg
+            }), this)
+
+        cc.eventManager.addListener(
+            cc.EventListener.create({
+                event: cc.EventListener.CUSTOM,
+                target: this,
                 eventName: config.eventCustom.MSG_STOCK,
                 callback: this.receivedNotificationOMsg
             }), this)
@@ -795,7 +804,6 @@ var GameBaseLayer = cc.Layer.extend({
     },
     receivedNotificationOMsg: function (event) {
         var obj = event.getCurrentTarget()
-
         var arrMessage = event.getUserData().split("-")
         var retMsgType = parseInt(arrMessage[0])
         if (arrMessage.length > 3) {
@@ -1067,15 +1075,15 @@ var GameBaseLayer = cc.Layer.extend({
                 break
             }
             case config.eventTag.MSG_DIMISS_DIALOG_PUBLISH_LOTTERY_TAG: {
-                for (var i = 0; i < obj.arrPlayers.length; i++) {
-                    obj.refreshMoneyLabel(obj.arrPlayers[i], 0)
+                for (var i = 0; i < GameBaseLayer.arrPlayers.length; i++) {
+                    obj.refreshMoneyLabel(GameBaseLayer.arrPlayers[i], 0)
                 }
                 obj.showGoButton()
                 break
             }
             case config.eventTag.MSG_STOCK_LAYER_DISMISS_TAG: {
-                for (var i = 0; i < obj.arrPlayers.length; i++) {
-                    obj.refreshMoneyLabel(obj.arrPlayers[i], 0)
+                for (var i = 0; i < GameBaseLayer.arrPlayers.length; i++) {
+                    obj.refreshMoneyLabel(GameBaseLayer.arrPlayers[i], 0)
                 }
                 break
             }
@@ -1198,7 +1206,7 @@ var GameBaseLayer = cc.Layer.extend({
             var diffMoney = player.money - this.arrStock[selectedTag].nowPrice * 100;
             if(diffMoney >= 0)
             {
-                var s = player.stockMap[selectedTag];
+                var s = player.stockMap[selectedTag].stock;
                 var storeNumber = s.storeNumber + 100;
                 var dealPrice = (s.makedealprice * s.storeNumber + this.arrStock[selectedTag].nowPrice * 100) / (100 + s.storeNumber);
                 s.storeNumber += 100
@@ -1239,8 +1247,8 @@ var GameBaseLayer = cc.Layer.extend({
                     cc.eventManager.dispatchEvent(event)
                 }
             }
-        } else if (buyOrSellTag == 0) {
-            var s = player.stockMap[selectedTag];
+        } else if (buyOrSellTag === 0) {
+            var s = player.stockMap[selectedTag].stock;
             var storeNumber = s.storeNumber;
             if(storeNumber > 0)
             {
@@ -2174,9 +2182,19 @@ var GameBaseLayer = cc.Layer.extend({
         this.popDialogLottery.setVisible(false)
     },
     popPublishLottery: function(dt) {
-        this.popDialogLottery.setVisible(true);
-        this.popDialogLottery.addPlayersLottery();
-        this.popDialogLottery.runPublishAnmi();
+        var popDialogLottery = new CustomizedPopupLayer()
+        popDialogLottery.addBackground(res.dialogBg_png)
+        popDialogLottery.setContentSize(cc.size(400, 400))
+        popDialogLottery.addTitle(getText("publish_lottery"), 20)
+        popDialogLottery.addContent("", 20, 60, 250)
+        popDialogLottery.popType = config.popType.LOTTERY_PUBLISH
+        popDialogLottery.arrPlayers = GameBaseLayer.arrPlayers
+        popDialogLottery.setTag(100)
+        // popDialogLottery.setVisible(true)
+        this.addChild(popDialogLottery)
+
+        popDialogLottery.addPlayersLottery();
+        popDialogLottery.runPublishAnmi();
     }
 })
 

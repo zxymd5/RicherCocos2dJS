@@ -21,7 +21,7 @@ var SeaLayer = GameBaseLayer.extend({
         this.doSomeForParticle()
         this.initRandomAskEvent()
         this.registerBlockWaySchedule()
-        this.initPopPublishLottery()
+        // this.initPopPublishLottery()
         this.initAudioEffect()
 
     },

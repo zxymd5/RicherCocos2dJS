@@ -21,10 +21,13 @@ var LineChart = cc.LayerColor.extend({
     layerHeight1: 0,
     moveTag: -1,
 
-    ctor: function() {
+    ctor: function(player, arrStockPoint1, arrStockPoint2, arrStockPoint3, arrStockPoint4, arrStockPoint5) {
         this._super()
-        this.init(cc.color(0, 0, 0, 255))
-
+        this.init(player, arrStockPoint1, arrStockPoint2, arrStockPoint3, arrStockPoint4, arrStockPoint5)
+    },
+    init: function(player, arrStockPoint1, arrStockPoint2, arrStockPoint3, arrStockPoint4, arrStockPoint5) {
+        this._super(cc.color(0, 0, 0, 255))
+        this.initChart(player, arrStockPoint1, arrStockPoint2, arrStockPoint3, arrStockPoint4, arrStockPoint5)
     },
     initChart: function(player, arrStockPoint1, arrStockPoint2, arrStockPoint3, arrStockPoint4, arrStockPoint5) {
         this.arrStockPoint1 = arrStockPoint1
@@ -97,8 +100,9 @@ var LineChart = cc.LayerColor.extend({
             }
 
             var labelX = new cc.LabelTTF(String(i), "Thonburi", 20);
+
             labelX.setPosition(cc.p(ePoint.x, 0));
-            labelX.setAnchorPoint(cc.p(0,0));
+            labelX.setAnchorPoint(cc.p(0.5,0));
             labelX.setTag(100 + 11 + i);
             this.addChild(labelX);
             layer_wd += 50;
@@ -109,7 +113,7 @@ var LineChart = cc.LayerColor.extend({
     drawLine: function(arrPoint, lineColor, dotColor) {
         var layerSize = cc.size(cc.winSize.width,cc.winSize.height * 1 /2);
         var layerWidth = layerSize.width;
-        var tempWidth = layerSize.height * spaceRatio;
+        var tempWidth = layerSize.height * this.spaceRatio;
         var tempWidth2 = 0;
         var tempHeight1 = this.maxValue1
         var ratio = tempWidth/tempHeight1
@@ -252,12 +256,14 @@ var LineChart = cc.LayerColor.extend({
     initMenu: function() {
         this.menu = new cc.Menu()
         this.menu.setPosition(cc.p(0,0))
+        this.addChild(this.menu)
 
         var buyMenuItem = new cc.MenuItemImage(res.buyNormal_png, res.buyPressed_png, this.buttonCallback, this);
         buyMenuItem.setPosition(cc.p(700, cc.winSize.height - 110))
         buyMenuItem.setAnchorPoint(cc.p(0,0))
         buyMenuItem.setTag(LineChart.buyButton)
         this.menu.addChild(buyMenuItem)
+
 
         var sellMenuItem = new cc.MenuItemImage(res.sellNormal_png, res.sellPressed_png, this.buttonCallback, this);
         sellMenuItem.setPosition(cc.p(700, cc.winSize.height - 180))
@@ -289,7 +295,7 @@ var LineChart = cc.LayerColor.extend({
             {
                 var diffMoney = this.richerPlayer.money - this.arrStock[this.selectedTag].nowPrice * 100
                 if (diffMoney >= 0) {
-                    var s = this.playerStockMap[this.selectedTag]
+                    var s = this.playerStockMap[this.selectedTag].stock
                     var storeNumber = s.storeNumber + 100;
 
                     var dealPrice = (s.makedealprice * s.storeNumber + this.arrStock[this.selectedTag].nowPrice * 100) / (100 + s.storeNumber);
@@ -315,7 +321,7 @@ var LineChart = cc.LayerColor.extend({
             }
             case LineChart.sellButton:
             {
-                var s = this.playerStockMap[this.selectedTag]
+                var s = this.playerStockMap[this.selectedTag].stock
                 var storeNumber = s.storeNumber
                 if(storeNumber > 0)
                 {
@@ -471,6 +477,9 @@ var LineChart = cc.LayerColor.extend({
             }
         }
         return cell
+    },
+    numberOfCellsInTableView:function (table) {
+        return 5;
     },
     setData: function(data) {
         this.arrPoint = []

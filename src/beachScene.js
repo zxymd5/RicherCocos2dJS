@@ -17,11 +17,10 @@ var BeachLayer = GameBaseLayer.extend({
         this.addDigiteRoundSprite()
         this.refreshRoundDisplay()
         this.initItemSprite()
-        // this.initPopDialog()
         this.doSomeForParticle()
         this.initRandomAskEvent()
         this.registerBlockWaySchedule()
-        this.initPopPublishLottery()
+        // this.initPopPublishLottery()
         this.initAudioEffect()
 
     },
