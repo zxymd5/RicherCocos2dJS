@@ -559,7 +559,7 @@ var GameBaseLayer = cc.Layer.extend({
             var needLostStrength = 60 - this.player1.arrSkill[1] * 10;
             if(this.player1.strength >= needLostStrength)
             {
-                this.player1.length -= needLostStrength;
+                this.player1.strength -= needLostStrength;
                 this.refreshStrengthLabel(this.player1,0);
                 this.showSkillSprites();
 
@@ -1034,7 +1034,7 @@ var GameBaseLayer = cc.Layer.extend({
                         obj.player2.arrLottery.push(randomLotteryNumber)
                         obj.refreshMoneyLabel(obj.player2, -1000)
                         if (obj.moveTag === config.moveTag.GOEND) {
-                            var msg = getText("buy_lottery") + " 10000"
+                            var msg = getText("buy_lottery") + " 1000"
                             var toast = new ToastLayer(msg, 2.0, obj.player2.getPosition(), cc.callFunc(function (target) {
                                 var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
                                 event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
@@ -1042,7 +1042,7 @@ var GameBaseLayer = cc.Layer.extend({
                             }, obj))
                             obj.addChild(toast)
                         } else if (obj.moveTag === config.moveTag.MOVEPASS) {
-                            var msg = getText("buy_lottery") + " 10000"
+                            var msg = getText("buy_lottery") + " 1000"
                             var toast = new ToastLayer(msg, 2.0, obj.player2.getPosition(), cc.callFunc(function (target) {
                                 var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
                                 event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
@@ -1364,7 +1364,7 @@ var GameBaseLayer = cc.Layer.extend({
             layer.refreshMoneyLabel(layer.player1, -1000)
 
             if (layer.moveTag === config.moveTag.GOEND) {
-                var msg = getText("buy_lottery") + " 10000"
+                var msg = getText("buy_lottery") + " 1000"
                 var toast = new ToastLayer(msg, 2.0, layer.player1.getPosition(), cc.callFunc(function (target) {
                     var event = new cc.EventCustom(config.eventCustom.MSG_AROUND_LAND)
                     event.setUserData(String(config.eventTag.MSG_AROUND_LAND_TAG))
@@ -1372,7 +1372,7 @@ var GameBaseLayer = cc.Layer.extend({
                 }, layer))
                 layer.addChild(toast)
             } else if (layer.moveTag === config.moveTag.MOVEPASS) {
-                var msg = getText("buy_lottery") + " 10000"
+                var msg = getText("buy_lottery") + " 1000"
                 var toast = new ToastLayer(msg, 2.0, layer.player1.getPosition(), cc.callFunc(function (target) {
                     var event = new cc.EventCustom(config.eventCustom.MSG_MOVE_ONE_STEP)
                     event.setUserData(String(config.eventTag.MSG_MOVE_ONE_STEP_TAG))
@@ -1907,8 +1907,6 @@ var GameBaseLayer = cc.Layer.extend({
         this.itemBall.setAnchorPoint(cc.p(0, 0));
     },
     doBlockWayEvent: function (player) {
-        cc.log("player: %o", player)
-
         var crabPos = this.itemCrab.getPosition()
         crabPos.x += this.itemCrab.width / 2
         crabPos.y -= this.itemCrab.height / 2
@@ -2168,18 +2166,6 @@ var GameBaseLayer = cc.Layer.extend({
         {
             this.player2_strength_label.setString("+ " + player.strength)
         }
-    },
-    initPopPublishLottery: function () {
-        this.popDialogLottery = new CustomizedPopupLayer()
-        this.popDialogLottery.addBackground(res.dialogBg_png)
-        this.popDialogLottery.setContentSize(cc.size(400, 400))
-        this.popDialogLottery.addTitle(getText("publish_lottery"), 20)
-        this.popDialogLottery.addContent("", 20, 60, 250)
-        this.popDialogLottery.popType = config.popType.LOTTERY_PUBLISH
-        this.popDialogLottery.arrPlayers = GameBaseLayer.arrPlayers
-        this.popDialogLottery.setTag(100)
-        this.addChild(this.popDialogLottery)
-        this.popDialogLottery.setVisible(false)
     },
     popPublishLottery: function(dt) {
         var popDialogLottery = new CustomizedPopupLayer()

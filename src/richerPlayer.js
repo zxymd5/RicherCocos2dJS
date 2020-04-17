@@ -78,7 +78,7 @@ var RicherPlayer = cc.Sprite.extend({
             stock: new Stock(800500, getText("rich_technology"), 0, 0, 0, 0)
         })
 
-        this.arrSkill.push([1, 1, 1])
+        this.arrSkill = [1, 1, 1]
         this.addSkillAnimation()
         return true
     },

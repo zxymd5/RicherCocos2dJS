@@ -71,8 +71,6 @@ var MenuLayer = cc.LayerColor.extend({
                 break;
             }
             case tagRes.BtnMultiGameTag: {
-                var toast = new ToastLayer("You really wanna exit?", 10, cc.p(100, 100), cc.callFunc(this.testCallback, this))
-                this.addChild(toast)
                 break;
             }
             case tagRes.BtnMusicTag: {
@@ -101,10 +99,6 @@ var MenuLayer = cc.LayerColor.extend({
         } else {
             node.getParent().getParent().removeFromParent()
         }
-    },
-    testCallback: function()
-    {
-        var k = 0
     },
     popupQuitDialog: function() {
 

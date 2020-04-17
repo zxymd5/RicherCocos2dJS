@@ -1,7 +1,6 @@
 var PopupLayer = cc.Layer.extend({
 
     dataTag: 0,
-    callbackFunc2: null,
     cbListener: null,
     touchListener: null,
 
@@ -66,24 +65,5 @@ var PopupLayer = cc.Layer.extend({
 
         var menu = new cc.Menu(item)
         this.addChild(menu)
-    },
-
-    addButton2: function (position, normalImg, pressImg, text, tag) {
-        var item = new cc.MenuItemImage(normalImg, pressImg, this.onButton2, this);
-        item.setTag(tag)
-        item.setPosition(position)
-        var size = item.getContentSize()
-        var label = new cc.LabelTTF(text, "Arial", 20)
-        label.setColor(cc.color.BLACK)
-        label.setPosition(cc.p(size.width / 2, size.height / 2))
-        item.addChild(label)
-
-        var menu = new cc.Menu(item)
-        this.addChild(menu)
-    },
-    onButton2: function (sender) {
-        if (this.callbackFunc2) {
-            this.callbackFunc2._function(sender)
-        }
     }
 })

@@ -10,11 +10,11 @@ var ToastLayer = cc.LayerColor.extend({
         var label = new cc.LabelTTF(msg, "Arial", 20)
         label.setColor(cc.color.WHITE)
         label.ignoreAnchorPointForPosition(false)
-        label.setAnchorPoint(cc.p(0, 0))
+        label.setAnchorPoint(cc.p(0, -0.4))
 
         var size = label.getContentSize()
-        size.width += 20
-        size.height += 15
+        size.width += 15
+        size.height += 20
         this.setContentSize(size)
         this.setPosition(point)
         this.addChild(label)

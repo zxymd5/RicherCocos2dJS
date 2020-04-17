@@ -17,11 +17,9 @@ var SeaLayer = GameBaseLayer.extend({
         this.addDigiteRoundSprite()
         this.refreshRoundDisplay()
         this.initItemSprite()
-        // this.initPopDialog()
         this.doSomeForParticle()
         this.initRandomAskEvent()
         this.registerBlockWaySchedule()
-        // this.initPopPublishLottery()
         this.initAudioEffect()
 
     },
